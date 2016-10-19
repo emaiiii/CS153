@@ -331,7 +331,7 @@ int get_priority(void)
   struct proc *wp;	// the current process
   int top = 0;
 
-  for(wp = ptable.proc; wp < $ptable.proc[NPROC]; wp++)
+  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)
   {
     if(wp->state != RUNNABLE) {continue;}
     if(wp->priorityValue > top) {top = wp->priorityValue;}	// set top to the highest priority
