@@ -48,6 +48,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->priorityValue = 31;	// midpoint
 
   release(&ptable.lock);
 
@@ -151,13 +152,28 @@ int fork(void)
   np->sz = proc->sz;
   np->parent = proc;
   *np->tf = *proc->tf;
-
+  
+  np->status = 0;
+  np->wcount = 0;
+  np->priorityValue = 31;	// midpoint
+  int wpid_cnt = sizeof(np->wpid);
+  
+  // Clear the waitlist
+  for(i = 0; i < wpid_cnt; i++)
+  {
+     np->wpid[i] = 0;
+  }
+  
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
   for(i = 0; i < NOFILE; i++)
+  {
     if(proc->ofile[i])
+    {
       np->ofile[i] = filedup(proc->ofile[i]);
+    }
+  }
   np->cwd = idup(proc->cwd);
 
   safestrcpy(np->name, proc->name, sizeof(proc->name));
@@ -309,6 +325,33 @@ int waitpid(int pid, int *status, int options)
 		sleep(proc, &ptable.lock);
 	}	
 }
+
+int get_priority(void)
+{
+  struct proc *wp;	// the current process
+  int top = 0;
+
+  for(wp = ptable.proc; wp < $ptable.proc[NPROC]; wp++)
+  {
+    if(wp->state != RUNNABLE) {continue;}
+    if(wp->priorityValue > top) {top = wp->priorityValue;}	// set top to the highest priority
+  }
+
+  return top;
+}
+
+struct proc *curr_proc(void)
+{
+  struct proc *wp;	// the current process
+
+  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)
+  {
+    if(wp->state == RUNNING) {return wp;}
+  }
+
+  return wp;
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -320,16 +363,17 @@ int waitpid(int pid, int *status, int options)
 void scheduler(void)
 {
   struct proc *p;
+  int top = 0;
 
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+    
+    top = get_priority();
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+      if(p->state != RUNNABLE || top > p->priorityValue) {continue;}
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
