@@ -156,11 +156,16 @@ int fork(void)
   np->status = 0;
   np->wcount = 0;
   np->priorityValue = 31;	// midpoint
-  
+  int i = 0;
+
   // Clear the waitlist
-  for(i = 0; i < sizeof(np->wpid); i++)
+  if(sizeof(np->wpid) > 0)
   {
-     np->wpid[i] = 0;
+    while(i < sizeof(np->wpid))
+    {
+       np->wpid[i] = 0;
+       i++;
+    }
   }
   
   // Clear %eax so that fork returns 0 in the child.
