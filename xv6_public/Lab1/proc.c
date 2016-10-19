@@ -156,7 +156,7 @@ int fork(void)
   np->status = 0;
   np->wcount = 0;
   np->priorityValue = 31;	// midpoint
-  int i = 0;
+  i = 0;
 
   // Clear the waitlist
   if(sizeof(np->wpid) > 0)
