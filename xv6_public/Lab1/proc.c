@@ -333,12 +333,12 @@ int waitpid(int pid, int *status, int options)
 int get_priority(void)
 {
   struct proc *wp;	// the current process
-  int top = 0;
+  int top = 65000;
 
   for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)
   {
     if(wp->state != RUNNABLE) {continue;}
-    if(wp->priorityValue > top) {top = wp->priorityValue;}	// set top to the highest priority
+    if(wp->priorityValue < top) {top = wp->priorityValue;}	// set top to the highest priority
   }
 
   return top;
@@ -367,7 +367,7 @@ struct proc *curr_proc(void)
 void scheduler(void)
 {
   struct proc *p;
-  int top = 0;
+  int top = 65000;
 
   for(;;){
     // Enable interrupts on this processor.
