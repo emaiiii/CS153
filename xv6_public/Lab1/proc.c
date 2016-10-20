@@ -46,7 +46,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->priorityValue = 31;	// midpoint
+  p->priorityValue = 31;	// midpoint in the waitlist
 
   release(&ptable.lock);
 
@@ -148,17 +148,17 @@ int fork(void)
   np->parent = proc;
   *np->tf = *proc->tf;
   
-  np->status = 0;
-  np->wcount = 0;
+  np->status = 0;		// hard-coded exit status
+  np->wcount = 0;		// set wait counter to 0
   np->priorityValue = 31;	// midpoint
 
   // Clear the waitlist
-  if(sizeof(np->wpid) > 0)
+  if(sizeof(np->wpid) > 0)	// extra check in case something is weird with wpid
   {
-    i = 0;
-    while(i < 20)
+    i = 0;			// re-initialize i to 0
+    while(i < 20)		// continue iteration through the size of wpid
     {
-       np->wpid[i] = 0;
+       np->wpid[i] = 0;		// resets values of wpid to 0 (clears the process waitlist)
        i++;
     }
   }
@@ -319,12 +319,18 @@ int waitpid(int pid, int *status, int options)
 int get_priority(void)
 {
   struct proc *wp;	// the current process
-  int top = 65000;
+  int top = 0;		// initialize the top priority to the lowest priority num (top of the waitlist)
 
-  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)
+  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
   {
-    if(wp->state != RUNNABLE) {continue;}
-    if(wp->priorityValue < top) {top = wp->priorityValue;}	// set top to the highest priority
+    if(wp->state != RUNNABLE || wp->priorityValue < top) 
+    {
+	if(wp->priorityValue < top)		// check for a process with a higher priority
+	{
+  	   top = wp->priorityValue;		// set top to the new highest priority
+	}
+	continue;
+    }
   }
 
   return top;
@@ -333,9 +339,9 @@ struct proc *curr_proc(void)
 {
   struct proc *wp;	// the current process
 
-  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)
+  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
   {
-    if(wp->state == RUNNING) {return wp;}
+    if(wp->state == RUNNING) {return wp;}	// find the process that is currently being run
   }
 
   return wp;
@@ -542,8 +548,8 @@ void procdump(void)
 int functPriority(int priorityNumber)
 {
 	acquire(&ptable.lock);
-	proc->priorityValue = priorityNumber;
-	proc->state = RUNNABLE;
+	proc->priorityValue = priorityNumber;		// set the priority
+	proc->state = RUNNABLE;				// run the process
 	release(&ptable.lock);
 	yield();
 	return priorityNumber;

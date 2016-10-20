@@ -90,7 +90,7 @@ int sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
-int sys_functPriority(void)
+int sys_functPriority(void)		// get the priority
 {
   int priority;
   argptr(0, (char**) &priority, 4);
