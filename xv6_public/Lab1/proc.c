@@ -19,12 +19,10 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
-
 void pinit(void)
 {
   initlock(&ptable.lock, "ptable");
 }
-
 //PAGEBREAK: 32
 // Look in the process table for an UNUSED proc.
 // If found, change state to EMBRYO and initialize
@@ -75,7 +73,6 @@ found:
 
   return p;
 }
-
 //PAGEBREAK: 32
 // Set up first user process.
 void userinit(void)
@@ -112,7 +109,6 @@ void userinit(void)
 
   release(&ptable.lock);
 }
-
 // Grow current process's memory by n bytes.
 // Return 0 on success, -1 on failure.
 int growproc(int n)
@@ -129,7 +125,6 @@ int growproc(int n)
   switchuvm(proc);
   return 0;
 }
-
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -167,7 +162,6 @@ int fork(void)
        i++;
     }
   }
-  
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
@@ -179,20 +173,14 @@ int fork(void)
     }
   }
   np->cwd = idup(proc->cwd);
-
   safestrcpy(np->name, proc->name, sizeof(proc->name));
-
   int pid = np->pid;
-
   acquire(&ptable.lock);
-
   np->state = RUNNABLE;
-
   release(&ptable.lock);
 
   return pid;
 }
-
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
@@ -235,7 +223,6 @@ void exit(int status)
   sched();
   panic("zombie exit");
 }
-
 // The wait system call prevents the current process from ecxecution until any 
 // of its child processes are terminated and return the terminated exit status through the argument.
 // The system call returns the process id of the child that was terminated.
@@ -329,7 +316,6 @@ int waitpid(int pid, int *status, int options)
 		sleep(proc, &ptable.lock);
 	}	
 }
-
 int get_priority(void)
 {
   struct proc *wp;	// the current process
@@ -343,7 +329,6 @@ int get_priority(void)
 
   return top;
 }
-
 struct proc *curr_proc(void)
 {
   struct proc *wp;	// the current process
@@ -355,7 +340,6 @@ struct proc *curr_proc(void)
 
   return wp;
 }
-
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -396,7 +380,6 @@ void scheduler(void)
 
   }
 }
-
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
 // intena because intena is a property of this
@@ -427,7 +410,6 @@ void yield(void)
   sched();
   release(&ptable.lock);
 }
-
 // A fork child's very first scheduling by scheduler()
 // will swtch here.  "Return" to user space.
 void forkret(void)
@@ -483,7 +465,6 @@ void sleep(void *chan, struct spinlock *lk)
     acquire(lk);
   }
 }
-
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
 // The ptable lock must be held.
@@ -495,7 +476,6 @@ static void wakeup1(void *chan)
     if(p->state == SLEEPING && p->chan == chan)
       p->state = RUNNABLE;
 }
-
 // Wake up all processes sleeping on chan.
 void wakeup(void *chan)
 {
@@ -503,7 +483,6 @@ void wakeup(void *chan)
   wakeup1(chan);
   release(&ptable.lock);
 }
-
 // Kill the process with the given pid.
 // Process won't exit until it returns
 // to user space (see trap in trap.c).
@@ -525,7 +504,6 @@ int kill(int pid)
   release(&ptable.lock);
   return -1;
 }
-
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
