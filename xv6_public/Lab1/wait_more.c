@@ -1,7 +1,7 @@
 #include "param.h"
 #include "types.h"
-#include "stat.h"
 #include "user.h"
+#include "stat.h"
 #include "fs.h"
 #include "fcntl.h"
 #include "syscall.h"
@@ -12,7 +12,7 @@ int main(int argc, char ** argv){
     
     int begin = getpid();
     int pid = fork();
-    int i;
+    int i, wpid;
     int status;
     if(pid > 0){
         for(i = 0; i < 15 && pid > 0; i++){
@@ -28,12 +28,12 @@ int main(int argc, char ** argv){
             printf(1,"pid = %d\n",getpid());
             if(getpid() == begin+10){
                 printf(1,"pid %d waiting for %d\n",begin+10,begin+5);
-                int wpid = waitpid(begin+5,&status,0);
+                wpid = waitpid(begin+5,&status,0);
                 printf(1,"success clean %d\n",wpid);
             }
             if(getpid() == begin+12){
                 printf(1,"pid %d waiting for %d\n",begin+12,begin+5);
-                int wpid = waitpid(begin+5,&status,0);
+                wpid = waitpid(begin+5,&status,0);
                 if(wpid == -1)
                     printf(1,"no more waiting for %d\n",begin+5);
             }
