@@ -131,12 +131,11 @@ int growproc(int n)
 int fork(void)
 {
   struct proc *np;
-  int i;
+  int i, pid;
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
   }
-
   // Copy process state from p.
   if((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0){
     kfree(np->kstack);
@@ -148,20 +147,6 @@ int fork(void)
   np->parent = proc;
   *np->tf = *proc->tf;
   
-  np->status = 0;		// hard-coded exit status
-  np->wcount = 0;		// set wait counter to 0
-  np->priorityValue = 31;	// midpoint
-
-  // Clear the waitlist
-  if(sizeof(np->wpid) > 0)	// extra check in case something is weird with wpid
-  {
-    i = 0;			// re-initialize i to 0
-    while(i < 20)		// continue iteration through the size of wpid
-    {
-       np->wpid[i] = 0;		// resets values of wpid to 0 (clears the process waitlist)
-       i++;
-    }
-  }
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
@@ -173,11 +158,11 @@ int fork(void)
     }
   }
   np->cwd = idup(proc->cwd);
-  safestrcpy(np->name, proc->name, sizeof(proc->name));
-  int pid = np->pid;
-  acquire(&ptable.lock);
+  pid = np->pid;
   np->state = RUNNABLE;
-  release(&ptable.lock);
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
+  np->priorityValue = 32;
+  np->wcount = -1;
 
   return pid;
 }
@@ -334,17 +319,6 @@ int get_priority(void)
 }
 }
   return top;
-}
-struct proc *curr_proc(void)
-{
-  struct proc *wp;	// the current process
-
-  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
-  {
-    if(wp->state == RUNNING) {return wp;}	// find the process that is currently being run
-  }
-
-  return wp;
 }
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
