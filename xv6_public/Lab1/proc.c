@@ -273,23 +273,19 @@ int wait(int *status)
 // -1 if there is no process
 int waitpid(int pid, int *status, int options)
 {
+	int have;
 	struct proc *p;
 	acquire (&ptable.lock);
-	while(1)
+	for(;;)
 	{
-		int waitProcess = 0;
+		have = 0;
 		for(p = ptable.proc; &ptable.proc[NPROC] > p; ++p)
 		{
 			if(pid != p->pid)
 			{
 				continue;
 			}
-			waitProcess = 1;
-			if(sizeof(p->wpid) > p->wcount)
-			{
-				p->wpid[p->wcount] = proc;
-				p->wcount++;
-			}
+			have = 1;
 			// Clear the process if our child
 			if(p->state == ZOMBIE)
 			{
@@ -305,9 +301,14 @@ int waitpid(int pid, int *status, int options)
 				release(&ptable.lock);
 				return pid;
 			}
+			else
+			{
+				p->wcount++;
+				p->wpid[p->wcount] = proc;
+			}
 		}
 		//What is the point of waiting if there is no process?
-		if(!waitProcess || proc->killed)
+		if(!have || proc->killed)
 		{
 			release(&ptable.lock);
 			return -1;

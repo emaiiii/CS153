@@ -25,7 +25,7 @@ int main(){
             int j = 0;
             if(getpid() == begin+8){
                 printf(1," pid = %d, get higher priority\n\n",getpid());
-                change_priority(33);
+                functPriority(33);
             }
             while(j++ < 30000000);
             exit(0);
