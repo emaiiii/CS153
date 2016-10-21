@@ -43,7 +43,7 @@ int main(){
         if(ki == begin+8)
             printf(1," [%d] I should be done first\n",ki);
         else
-            printf(1," [%d] done runing\n",ki);
+            printf(1," [%d] done running\n",ki);
     }
     exit(0);
     return 0;

@@ -324,16 +324,15 @@ int get_priority(void)
 
   for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
   {
-    if(wp->state != RUNNABLE || wp->priorityValue < top) 
-    {
+    if(wp->state != RUNNABLE) 
+    {continue;}
+	if(top == 0){top = wp->priorityValue;}
+	else{
 	if(wp->priorityValue < top)		// check for a process with a higher priority
-	{
-  	   top = wp->priorityValue;		// set top to the new highest priority
-	}
-	continue;
-    }
+	{top = wp->priorityValue;		// set top to the new highest priority}
   }
-
+}
+}
   return top;
 }
 struct proc *curr_proc(void)
@@ -368,8 +367,12 @@ void scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE || top > p->priorityValue) {continue;}
-
+      if(p->state != RUNNABLE){continue;}
+	
+	release(&ptable.lock);
+	top = get_priority();
+	acquire(&ptable.lock);
+	if(top > p->priorityValue){continue;}
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -548,10 +551,8 @@ void procdump(void)
 }
 int functPriority(int priorityNumber)
 {
-	acquire(&ptable.lock);
-	proc->priorityValue = priorityNumber;		// set the priority
-	proc->state = RUNNABLE;				// run the process
-	release(&ptable.lock);
-	yield();
+	if(priorityNumber < 0){priorityNumber = 0;}
+	if(priorityNumber > 63){priorityNumber = 63;}
+	proc->priorityValue = priorityNumber;
 	return priorityNumber;
 }
