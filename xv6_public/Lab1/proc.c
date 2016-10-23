@@ -313,7 +313,7 @@ int get_priority(void)
     {continue;}
 	if(top == 0){top = wp->priorityValue;}
 	else{
-	if(wp->priorityValue < top)		// check for a process with a higher priority
+	if(wp->priorityValue > top)		// check for a process with a higher priority
 	{top = wp->priorityValue;		// set top to the new highest priority}
   }
 }
@@ -346,7 +346,7 @@ void scheduler(void)
 	release(&ptable.lock);
 	top = get_priority();
 	acquire(&ptable.lock);
-	if(top > p->priorityValue){continue;}
+	if(top < p->priorityValue){p->priorityValue = top;}
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
