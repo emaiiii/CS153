@@ -1,0 +1,60 @@
+Francisco Munoz  861174271
+Sara Hu 861150933
+Due Date: 10/23/2016
+Operating Systems Lab Section: 021
+
+Proc.c:
+	Line 208-245:
+		Wait function was put in place and added features to be able to wait for the process to be done.
+	Line 250-293:
+		Add the waitpid function to be able to run waitpid.
+	Line 294-311:
+		Modified to be able to get priority and sort the top priority.
+	Line 320-352:
+		Modified the Scheduler to be able to switch process with higher priority.
+	Line 503-509:
+		Get the priority of the process and store it. Make sure to keep it in a range of 0 to 63.
+Proc.h:
+	Line 68-71:
+		Added objects to the struct to be able to hold the waiting list of process, the number of processes waiting, the exit status, and the priority value of the process.
+Syscall.c:
+	Line 97-98:
+		Add the system calls to the system
+	Line 121-122:
+		Add the system calls to the syscalls array.
+Syscall.h:
+	Line 24-25:
+		Declared the system calls for waitpid and priority.
+Sysproc.c:
+	Line 13-19:
+		Exit system call
+	Line 20-25:
+		Wait system call
+	Line 26-33:
+		Waitpid system call
+	Line 82-87:
+		Priority system call
+User.h:
+	Line 8:
+		Waitpid function declaration
+	Line 27:
+		Priority function declaration
+Usertests.c:
+	All the lines that were changed in here were the exit function calls from a variable in the parameter to a constant number. 
+Usys.S:
+	Line 32-33:
+		Add the system calls for Priority and waitpid
+Stressfs.c:
+	Line 47:
+		Add the exit call
+Sh.c:
+	All the lines that were changed in here were the exit function calls from a variable in the parameter to a constant number and the wait calls.
+Defs.h:
+	Line 117:
+		Added the waitpid function call
+	Line 120:
+		Added the priority function call	
+Forktest.c:
+	All the lines that were change here were the exit function calls from a avariable in the parameter to a constant number.
+Makefile:
+	The UPROGS had some programs added, such as the test cases. EXTRA was modified to include all the test cases that we created for this assignment.
