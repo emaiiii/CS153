@@ -12,8 +12,7 @@ int main(int argc, char ** argv){
 
     int begin = getpid();
     int pid = fork();
-    int i;
-    int status;
+    int i, wpid, status;
     if(pid > 0){
         for(i = 0; i < 15 && pid > 0; i++){
             pid = fork();
@@ -28,7 +27,7 @@ int main(int argc, char ** argv){
             printf(1,"pid = %d\n",getpid());
             if(getpid() == begin+10){
                 printf(1,"pid %d waiting for %d\n",begin+10,begin+5);
-                int wpid = waitpid(begin+5,&status,0);
+                wpid = waitpid(begin+5,&status,0);
                 printf(1,"success clean %d, status is %d\n",wpid,status);
             }
             if(getpid() == begin+5){
@@ -37,6 +36,7 @@ int main(int argc, char ** argv){
             exit(0);
         }
     }else if(pid == 0){
+	sleep(100);
         int j = 0;
         while(j++ < 1000);
         exit(0);

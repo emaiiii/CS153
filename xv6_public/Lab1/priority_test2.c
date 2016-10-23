@@ -9,7 +9,7 @@
 #include "memlayout.h"
 
 int main(){
-    int i;
+    int i, status;
     int begin = getpid();
     int pid = fork();
     if(pid > 0){
@@ -23,34 +23,32 @@ int main(){
         }
         if (pid == 0){
             int j = 0;
+            if(getpid() == begin + 2){
+                printf(1," pid = %d, get higher priority\n\n",getpid());
+                functPriority(0);
+            }
             if(getpid() == begin + 5){
                 printf(1," pid = %d, get higher priority\n\n",getpid());
-                functPriority(33);
-            }
-            if(getpid() == begin + 8){
-                printf(1," pid = %d, get higher priority\n\n",getpid());
-                functPriority(33);
+                functPriority(0);
             }
             while(j++ < 30000000);
             exit(0);
         }
     }else if(pid == 0){
-       // sleep(100);
+        sleep(100);
         int j = 0;
         while(j++ < 30000000);
         exit(0);
     }
     int ki = 1;
-    int status;
     while(ki >= 0){
         ki = wait(&status);
-        if(ki == begin+5)
+        if(ki == begin+2)
             printf(1," [%d] I should be done first two\n",ki);
-        else if(ki == begin+8)
+        else if(ki == begin+5)
             printf(1," [%d] I should be done first two\n",ki);
         else
             printf(1," [%d] done running\n",ki);
-
     }
     exit(0);
     return 0;
