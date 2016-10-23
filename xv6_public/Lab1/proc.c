@@ -301,9 +301,16 @@ int get_priority(void)
     if(wp->state != RUNNABLE){continue;}
 	if(top == 0){top = wp->priorityValue;}
 	else{
+<<<<<<< HEAD
 		if(wp->priorityValue < top)		// check for a process with a higher priority
 		{top = wp->priorityValue;}		// set top to the new highest priority}
 	}
+=======
+	if(wp->priorityValue > top)		// check for a process with a higher priority
+	{top = wp->priorityValue;		// set top to the new highest priority}
+  }
+}
+>>>>>>> 7ab5d370d87a4150c540c71c6a1aafc95086fbc7
 }
 	release(&ptable.lock);
   return top;
@@ -332,7 +339,7 @@ void scheduler(void)
 	release(&ptable.lock);
 	top = get_priority();
 	acquire(&ptable.lock);
-	if(top > p->priorityValue){continue;}
+	if(top < p->priorityValue){p->priorityValue = top;}
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
