@@ -12,36 +12,29 @@ int sys_fork(void)
 }
 int sys_exit(void)
 {
-  int status;
-  argptr(0, (char**) &status, 4);
-  exit(status);
-  return 0;  // not reached
+	int status;
+	if(0 > argint(0, &status)) {return -1;}
+	else{exit(status);}
+	return 0; // not reached
 }
 int sys_wait(void)
 {
-  int size = 4;
-  int val;
-  int * value = &val;
-  if(argptr(0, (char**) value, size) < 0)
-	{return -1;}
-  int* status = (int*)(&value);
-  return wait(status);
+	int *value;
+	if(argptr(0, (char**)value, sizeof(value)) < 0){return -1;}
+ 	return wait(value);
 }
 int sys_waitpid(void)
 {
-	int pid, options;
-	int *status;
-	argptr(0, (char**) &pid, 4);
-	argptr(1, (char**) &status, 4);
-	argptr(2, (char**) &options, 4);
+	int pid, options, *status;
+	if(0 > argint(0, &pid)){return -1;}
+	if(0 > argptr(1, (char**)&status, sizeof(status))){return -1;}
+	if(argint(2, (char**) &options)){return -1;}
 	return waitpid(pid, status, options);
 }	
 int sys_kill(void)
 {
   int pid;
-
-  if(argint(0, &pid) < 0)
-    return -1;
+  if(argint(0, &pid) < 0){return -1;}
   return kill(pid);
 }
 int sys_getpid(void)
@@ -53,11 +46,9 @@ int sys_sbrk(void)
   int addr;
   int n;
 
-  if(argint(0, &n) < 0)
-    return -1;
+  if(argint(0, &n) < 0){return -1;}
   addr = proc->sz;
-  if(growproc(n) < 0)
-    return -1;
+  if(growproc(n) < 0){return -1;}
   return addr;
 }
 int sys_sleep(void)
@@ -65,8 +56,7 @@ int sys_sleep(void)
   int n;
   uint ticks0;
 
-  if(argint(0, &n) < 0)
-    return -1;
+  if(argint(0, &n) < 0){return -1;}
   acquire(&tickslock);
   ticks0 = ticks;
   while(ticks - ticks0 < n){
@@ -84,7 +74,6 @@ int sys_sleep(void)
 int sys_uptime(void)
 {
   uint xticks;
-
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
@@ -93,6 +82,6 @@ int sys_uptime(void)
 int sys_functPriority(void)		// get the priority
 {
   int priority;
-  argptr(0, (char**) &priority, 4);
+  if(0 > argint(0, (char**) &priority)){return -1;}
   return functPriority(priority);
 }
