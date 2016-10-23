@@ -42,7 +42,8 @@ int main(int argc, char ** argv){
             exit(0);
         }
     }else if(pid == 0){
-        int j = 0;
+        sleep(100);
+	int j = 0;
         while(j++ < 1000);
         exit(0);
     }

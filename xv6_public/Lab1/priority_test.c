@@ -23,7 +23,7 @@ int main(){
         }
         if (pid == 0){
             int j = 0;
-            if(getpid() == begin+5){
+            if(getpid() == begin+3){
                 printf(1," pid = %d, get higher priority\n\n",getpid());
                 functPriority(0);
             }
@@ -39,7 +39,7 @@ int main(){
     int ki = 1;
     while(ki >= 0){
         ki = wait(&status);
-        if(ki == begin+5)
+        if(ki == begin+3)
             printf(1," [%d] I should be done first\n",ki);
         else
             printf(1," [%d] done running\n",ki);
