@@ -294,7 +294,7 @@ int waitpid(int pid, int *status, int options)
 int get_priority(void)
 {
   struct proc *wp;	// the current process
-  int top = 0;		// initialize the top priority to the lowest priority num (top of the waitlist)
+  int top = 65000;		// initialize the top priority to the lowest priority num (top of the waitlist)
 	acquire(&ptable.lock);
   for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
   {

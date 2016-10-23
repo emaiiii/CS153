@@ -20,11 +20,11 @@ void iputtest(void)
 
   if(mkdir("iputdir") < 0){
     printf(stdout, "mkdir failed\n");
-    exit(1);
+    exit(0);
   }
   if(chdir("iputdir") < 0){
     printf(stdout, "chdir iputdir failed\n");
-    exit(1);
+    exit(0);
   }
   if(unlink("../iputdir") < 0){
     printf(stdout, "unlink ../iputdir failed\n");
