@@ -35,8 +35,7 @@ struct {
   struct buf head;
 } bcache;
 
-void
-binit(void)
+void binit(void)
 {
   struct buf *b;
 
@@ -106,8 +105,7 @@ bread(uint dev, uint blockno)
 }
 
 // Write b's contents to disk.  Must be locked.
-void
-bwrite(struct buf *b)
+void bwrite(struct buf *b)
 {
   if(!holdingsleep(&b->lock))
     panic("bwrite");
@@ -117,8 +115,7 @@ bwrite(struct buf *b)
 
 // Release a locked buffer.
 // Move to the head of the MRU list.
-void
-brelse(struct buf *b)
+void brelse(struct buf *b)
 {
   if(!holdingsleep(&b->lock))
     panic("brelse");
