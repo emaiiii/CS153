@@ -1,0 +1,24 @@
+Sara Hu 861150933
+Francisco Munoz 861174271
+Due: 10/23/16
+Lec Sec: 001
+Lab Sec: 021
+
+To implement priority donation/priority inheritance we would set a low-priority process’s priority value (say B) 
+with the priority value of the high-priority process (say A).  This way process A would be run until it completes 
+its critical section and then process B’s priority value will be reset to its original priority value and allow 
+process A to run.  For example, if process B has a priority value of 3 and process A is at the top of the waitlist 
+with a priority value of 1.  Process B’s priority value would temporarily be changed to 1 allowing process B to run 
+its critical section.  Now after process B is done running, its priority value is set back to 3 and process A will 
+run and subsequently the next highest priority process after as normal.  In order to implement this, the scheduler() 
+function must be modified in proc.c, where the lower-priority process’s priority value is changed to the higher-priority 
+process’s priority value and a lock is put on the higher-priority process to allow the lower-priority process to run 
+through the shared resource.  Then, the lower-priority process’s priority value is reset back to its original value and 
+the lock on the higher-priority process is released.
+
+In order to track the scheduling performance of each process, again, the scheduler() function in proc.c would need to be 
+modified.  A start time would need to be marked when a process is started (before the switch), a burst time to mark how 
+long a process uses the processor, and an end time to mark when a process finishes running (after the switch).  Using 
+these 3 times, the turnaround time and the wait time can be calculated with the following equations:  
+waitTime = startTime - endTime, turnaroundTime = burstTime + waitTime.
+
