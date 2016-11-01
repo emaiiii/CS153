@@ -36,7 +36,6 @@ void seginit(void)
   cpu = c;
   proc = 0;
 }
-
 // Return the address of the PTE in page table pgdir
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page table pages.
@@ -128,8 +127,8 @@ pde_t* setupkvm(void)
 
   if((pgdir = (pde_t*)kalloc()) == 0)
     return 0;
-  memset(pgdir, 0, PGSIZE);
-  if (P2V(PHYSTOP) > (void*)DEVSPACE)
+  memset(pgdir, 0, PGSIZE); //PGSIZE = 4096 bytes
+  if (P2V(PHYSTOP) > (void*)DEVSPACE) // if the top phyiscal memory is greater than 0xFE00000, panic.
     panic("PHYSTOP too high");
   for(k = kmap; k < &kmap[NELEM(kmap)]; k++)
     if(mappages(pgdir, k->virt, k->phys_end - k->phys_start,
@@ -137,7 +136,6 @@ pde_t* setupkvm(void)
       return 0;
   return pgdir;
 }
-
 // Allocate one page table for the machine for the kernel address
 // space for scheduler processes.
 void kvmalloc(void)
@@ -145,14 +143,12 @@ void kvmalloc(void)
   kpgdir = setupkvm();
   switchkvm();
 }
-
 // Switch h/w page table register to the kernel-only page table,
 // for when no process is running.
 void switchkvm(void)
 {
   lcr3(V2P(kpgdir));   // switch to the kernel page table
 }
-
 // Switch TSS and h/w page table to correspond to process p.
 void switchuvm(struct proc *p)
 {

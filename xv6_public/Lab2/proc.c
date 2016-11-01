@@ -28,8 +28,7 @@ void pinit(void)
 // If found, change state to EMBRYO and initialize
 // state required to run in the kernel.
 // Otherwise return 0.
-static struct proc*
-allocproc(void)
+static struct proc* allocproc(void)
 {
   struct proc *p;
   char *sp;
@@ -507,10 +506,14 @@ int functPriority(int priorityNumber)
 	proc->priorityValue = priorityNumber;
 	return 0;
 }
-int* v2p(int virtual, int *physical)
+int v2p(int virtual, int *physical)
 {
-	// conversion of virtual to physical
-	//First where to get virtual address
-	// convert to physical address
-	// Return the address
+	static pte_t *temp;
+	const void *va = &virtual;
+	temp = walkpgdir(pgdir, va, 0);
+	if(temp == 0)
+		return -1;
+	else
+		physical = (int*)P2V(PTE_ADDR(*temp));
+		return 1;
 }

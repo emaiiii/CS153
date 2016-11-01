@@ -15,12 +15,12 @@ int exec(char *path, char **argv)
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
-  pde_t *pgdir, *oldpgdir;
+  pde_t *pgdir, *oldpgdir;  // the new page directory and the old page directory
 
-  begin_op();
+  begin_op(); // begin process operation
 
   if((ip = namei(path)) == 0){
-    end_op();
+    end_op(); // end process operation
     return -1;
   }
   ilock(ip);
@@ -32,6 +32,8 @@ int exec(char *path, char **argv)
   if(elf.magic != ELF_MAGIC)
     goto bad;
 
+
+// If the setting up the kernel virtual memory does not execute properly, you go to bad switch case.
   if((pgdir = setupkvm()) == 0)
     goto bad;
 
@@ -42,14 +44,19 @@ int exec(char *path, char **argv)
       goto bad;
     if(ph.type != ELF_PROG_LOAD)
       continue;
+// If the physical memory size is less than the physical file size, swithc over to bad case
     if(ph.memsz < ph.filesz)
       goto bad;
+
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
+// If the allocation of user virtual memory returns a 0, then switch to bad case
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
       goto bad;
+// If virtual address is fragmented and not complete, switch to bad case
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
+// If loading the user virtual memory does not execute correctly, switch to base case
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
@@ -100,6 +107,7 @@ int exec(char *path, char **argv)
   freevm(oldpgdir);
   return 0;
 
+// The kernel virtual memory was not set up correctly. If the page directory does exist, you free the virtual memory, then release the ip number and end the process operation.
  bad:
   if(pgdir)
     freevm(pgdir);
