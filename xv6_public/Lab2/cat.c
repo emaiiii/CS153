@@ -3,9 +3,7 @@
 #include "user.h"
 
 char buf[512];
-
-void
-cat(int fd)
+void cat(int fd)
 {
   int n;
 
@@ -20,9 +18,7 @@ cat(int fd)
     exit(1);
   }
 }
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int fd, i;
 

@@ -16,15 +16,13 @@ struct {
   struct file file[NFILE];
 } ftable;
 
-void
-fileinit(void)
+void fileinit(void)
 {
   initlock(&ftable.lock, "ftable");
 }
 
 // Allocate a file structure.
-struct file*
-filealloc(void)
+struct file* filealloc(void)
 {
   struct file *f;
 
@@ -41,8 +39,7 @@ filealloc(void)
 }
 
 // Increment ref count for file f.
-struct file*
-filedup(struct file *f)
+struct file* filedup(struct file *f)
 {
   acquire(&ftable.lock);
   if(f->ref < 1)
@@ -53,8 +50,7 @@ filedup(struct file *f)
 }
 
 // Close file f.  (Decrement ref count, close when reaches 0.)
-void
-fileclose(struct file *f)
+void fileclose(struct file *f)
 {
   struct file ff;
 
@@ -80,8 +76,7 @@ fileclose(struct file *f)
 }
 
 // Get metadata about file f.
-int
-filestat(struct file *f, struct stat *st)
+int filestat(struct file *f, struct stat *st)
 {
   if(f->type == FD_INODE){
     ilock(f->ip);
@@ -93,8 +88,7 @@ filestat(struct file *f, struct stat *st)
 }
 
 // Read from file f.
-int
-fileread(struct file *f, char *addr, int n)
+int fileread(struct file *f, char *addr, int n)
 {
   int r;
 
@@ -114,8 +108,7 @@ fileread(struct file *f, char *addr, int n)
 
 //PAGEBREAK!
 // Write to file f.
-int
-filewrite(struct file *f, char *addr, int n)
+int filewrite(struct file *f, char *addr, int n)
 {
   int r;
 
@@ -154,4 +147,3 @@ filewrite(struct file *f, char *addr, int n)
   }
   panic("filewrite");
 }
-
