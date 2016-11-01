@@ -81,7 +81,7 @@ Bonus (5%): Write code to try and get the stack to grow into the heap. Were you 
 
 ##The Code
 
-You may also find the following readings about xv6 useful: [https://pdos.csail.mit.edu/6.828/2011/xv6/book-rev6.pdf](xv6 book).
+You may also find the following readings about xv6 useful: [xv6 book](https://pdos.csail.mit.edu/6.828/2011/xv6/book-rev6.pdf).
 
 **Particularly useful for this project:** Chapter 1 + anything else about fork() and exec(), as well as virtual memory.
 
