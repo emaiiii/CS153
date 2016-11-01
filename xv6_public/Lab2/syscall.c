@@ -64,8 +64,7 @@ int argptr(int n, char **pp, int size)
 // Check that the pointer is valid and the string is nul-terminated.
 // (There is no shared writable memory, so the string can't change
 // between this check and being used by the kernel.)
-int
-argstr(int n, char **pp)
+int argstr(int n, char **pp)
 {
   int addr;
   if(argint(n, &addr) < 0)
@@ -73,6 +72,7 @@ argstr(int n, char **pp)
   return fetchstr(addr, pp);
 }
 
+extern int sys_v2p(void);
 extern int sys_chdir(void);
 extern int sys_close(void);
 extern int sys_dup(void);
@@ -98,6 +98,7 @@ extern int sys_waitpid(void);
 extern int sys_functPriority(void);
 
 static int (*syscalls[])(void) = {
+[SYS_v2p]     sys_v2p,
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
 [SYS_wait]    sys_wait,

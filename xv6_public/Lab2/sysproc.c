@@ -85,3 +85,7 @@ int sys_functPriority(void)		// get the priority
   if(0 > argint(0, &priority)){return -1;}
   return functPriority(priority);
 }
+int sys_v2p(void)
+{
+	// add the real implementation
+}

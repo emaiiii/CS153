@@ -25,6 +25,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int functPriority(int);
+int* v2p(int, int*);
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);

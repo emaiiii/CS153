@@ -21,8 +21,7 @@ typedef union header Header;
 static Header base;
 static Header *freep;
 
-void
-free(void *ap)
+void free(void *ap)
 {
   Header *bp, *p;
 
@@ -42,9 +41,7 @@ free(void *ap)
     p->s.ptr = bp;
   freep = p;
 }
-
-static Header*
-morecore(uint nu)
+static Header* morecore(uint nu)
 {
   char *p;
   Header *hp;
@@ -59,9 +56,7 @@ morecore(uint nu)
   free((void*)(hp + 1));
   return freep;
 }
-
-void*
-malloc(uint nbytes)
+void* malloc(uint nbytes)
 {
   Header *p, *prevp;
   uint nunits;

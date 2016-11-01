@@ -507,3 +507,10 @@ int functPriority(int priorityNumber)
 	proc->priorityValue = priorityNumber;
 	return 0;
 }
+int* v2p(int virtual, int *physical)
+{
+	// conversion of virtual to physical
+	//First where to get virtual address
+	// convert to physical address
+	// Return the address
+}
