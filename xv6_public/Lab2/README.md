@@ -67,7 +67,7 @@ heap(grows towards the high-end of the address space)
 stack (at end of address space; grows backwards)
 ```
 
-thisl will take a little work on your part. First, you will have to figure out where xv6 allocates and initializes the user stack; then, you will have to figure out how to change that to use a page at the high-end of the xv6 user address space, instead of one between the code and heap.
+this will take a little work on your part. First, you will have to figure out where xv6 allocates and initializes the user stack; then, you will have to figure out how to change that to use a page at the high-end of the xv6 user address space, instead of one between the code and heap.
 
 Some tricky parts: one thing you will have to be very careful with is how xv6 currently tracks the size of a process's address space (currently with the sz field in the proc struct). there are a number of places in the code where this is used (e.g., to check whether an argument passed into the kernel is valid; to copy the address space. We recommend keeping this field to track the size of the code and heap, but doing some other accounting to track the stack, and changing all relevant code (i.e., that used to deal with sz) to now work with your new accounting.
 
