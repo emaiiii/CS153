@@ -34,7 +34,7 @@ In this part, you will be changing xv6 to support a feature available in virtual
 
 #### Details
 
-In xv6, the VM system uses a simple two-level page table. If you do not remember the details, read [http://pages.cs.wisc.edu/~remzi/OSTEP/vm-smalltables.pdf] (Section 20.3 of OS 3 easy steps). However, you may find the description in Chapter 1 of the xv6 manual sufficient (and more relevant to the assignment). As it currently is structured, user code is loaded into the very first part of the address space. Thus, if you dereference a null pointer, you will not see an exception (as you might expect); rather, you will see whatever code is the first bit of code in the program that is running. Try it and see!
+In xv6, the VM system uses a simple two-level page table. If you do not remember the details, read [Section 20.3 of OS 3 easy Steps](http://pages.cs.wisc.edu/~remzi/OSTEP/vm-smalltables.pdf). However, you may find the description in Chapter 1 of the xv6 manual sufficient (and more relevant to the assignment). As it currently is structured, user code is loaded into the very first part of the address space. Thus, if you dereference a null pointer, you will not see an exception (as you might expect); rather, you will see whatever code is the first bit of code in the program that is running. Try it and see!
 
 Thus, the first thing you might do is create a program that dereferences a null pointer. It is simple! See if you can do it. Then run it on Linux as well as xv6, to see the difference. 
 
