@@ -87,5 +87,5 @@ int sys_functPriority(void)		// get the priority
 }
 int sys_v2p(void)
 {
-	// add the real implementation
+	// just finish this and i am done :D
 }

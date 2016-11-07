@@ -506,14 +506,18 @@ int functPriority(int priorityNumber)
 	proc->priorityValue = priorityNumber;
 	return 0;
 }
-int v2p(int virtual, int *physical)
+int v2p(int *virtual, int *physical)
 {
-	static pte_t *temp;
+	struct proc *p;
+	pde_t *temp;
+	acquire(&ptable.lock);
+	p = ptable.proc;
 	const void *va = &virtual;
-	temp = walkpgdir(pgdir, va, 0);
-	if(temp == 0)
-		return -1;
-	else
+	temp = &(p->pgdir[PDX(va)]);
+	if(*temp & 0x001){
 		physical = (int*)P2V(PTE_ADDR(*temp));
+		return 0;
+	}
+	else
 		return 1;
 }
