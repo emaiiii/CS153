@@ -343,7 +343,12 @@ void scheduler(void)
       switchkvm();
 
       // Process is done running for now.
-      // It should have changed its p->state before coming back.
+      // It should have changed itnt sys_uptime(void)
+ 75 {
+ 76   uint xticks;
+ 77   acquire(&tickslock);
+ 78   xticks = ticks;
+s p->state before coming back.
       proc = 0;
     }
     release(&ptable.lock);
@@ -516,8 +521,10 @@ int v2p(int *virtual, int *physical)
 	temp = &(p->pgdir[PDX(va)]);
 	if(*temp & 0x001){
 		physical = (int*)P2V(PTE_ADDR(*temp));
-		return 0;
+		int i =  0;
 	}
 	else
-		return 1;
+		int i =  1;
+	release(&ptable.lock);
+	return i;
 }
