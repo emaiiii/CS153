@@ -87,5 +87,11 @@ int sys_functPriority(void)		// get the priority
 }
 int sys_v2p(void)
 {
-	// just finish this and i am done :D
+	int *physical, *virtual;
+	if(argptr(0, (char**) &physical, sizeof(physical)) < 0)
+		return 0;
+	if(argptr(0, (char**) &virtual, sizeof(physical)) < 0)
+		return 0;
+	
+	return v2p(virtual, physical);
 }

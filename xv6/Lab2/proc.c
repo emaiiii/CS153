@@ -344,11 +344,6 @@ void scheduler(void)
 
       // Process is done running for now.
       // It should have changed itnt sys_uptime(void)
- 75 {
- 76   uint xticks;
- 77   acquire(&tickslock);
- 78   xticks = ticks;
-s p->state before coming back.
       proc = 0;
     }
     release(&ptable.lock);
@@ -513,18 +508,16 @@ int functPriority(int priorityNumber)
 }
 int v2p(int *virtual, int *physical)
 {
-	struct proc *p;
 	pde_t *temp;
 	acquire(&ptable.lock);
-	p = ptable.proc;
 	const void *va = &virtual;
-	temp = &(p->pgdir[PDX(va)]);
+	temp = &(proc->pgdir[PDX(va)]);
 	if(*temp & 0x001){
 		physical = (int*)P2V(PTE_ADDR(*temp));
-		int i =  0;
+		release(&ptable.lock);
+		return 0;
 	}
 	else
-		int i =  1;
-	release(&ptable.lock);
-	return i;
+		release(&ptable.lock);
+		return 1;
 }
