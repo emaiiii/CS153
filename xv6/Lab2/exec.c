@@ -17,12 +17,8 @@ int exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;  // the new page directory and the old page directory
 
-  begin_op(); // begin process operation
-
-  if((ip = namei(path)) == 0){
-    end_op(); // end process operation
+  if((ip = namei(path)) == 0)
     return -1;
-  }
   ilock(ip);
   pgdir = 0;
 
@@ -38,7 +34,7 @@ int exec(char *path, char **argv)
     goto bad;
 
   // Load program into memory.
-  sz = PGSIZE-1;
+  sz = 0;
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -47,21 +43,14 @@ int exec(char *path, char **argv)
 // If the physical memory size is less than the physical file size, swithc over to bad case
     if(ph.memsz < ph.filesz)
       goto bad;
-
-    if(ph.vaddr + ph.memsz < ph.vaddr)
-      goto bad;
 // If the allocation of user virtual memory returns a 0, then switch to bad case
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
-      goto bad;
-// If virtual address is fragmented and not complete, switch to bad case
-    if(ph.vaddr % PGSIZE != 0)
       goto bad;
 // If loading the user virtual memory does not execute correctly, switch to base case
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
-  end_op();
   ip = 0;
 
   // Allocate two pages at the next page boundary.
@@ -69,6 +58,8 @@ int exec(char *path, char **argv)
   sz = PGROUNDUP(sz);
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
+  proc->pstack = (uint *)sz;
+
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
   sp = sz;
 
@@ -111,9 +102,7 @@ int exec(char *path, char **argv)
  bad:
   if(pgdir)
     freevm(pgdir);
-  if(ip){
+  if(ip)
     iunlockput(ip);
-    end_op();
-  }
   return -1;
 }

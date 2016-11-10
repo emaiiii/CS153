@@ -142,18 +142,18 @@ int fork(void)
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
-  for(i = 0; i < NOFILE; i++)
-  {
-    if(proc->ofile[i]){np->ofile[i] = filedup(proc->ofile[i]);}
-  }
+	for(i = 0; i < NOFILE; i++)
+		if(proc->ofile[i])
+			np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
-  pid = np->pid;
-  np->state = RUNNABLE;
-  safestrcpy(np->name, proc->name, sizeof(proc->name));
-  np->priorityValue = 32;
-  np->wcount = -1;
+  
+	pid = np->pid;
+  	np->state = RUNNABLE;
+  	safestrcpy(np->name, proc->name, sizeof(proc->name));
+  	np->priorityValue = 32;
+  	np->wcount = -1;
 
-  return pid;
+  	return pid;
 }
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
