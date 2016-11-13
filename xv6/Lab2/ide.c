@@ -18,7 +18,6 @@
 #define IDE_DRDY      0x40
 #define IDE_DF        0x20
 #define IDE_ERR       0x01
-
 #define IDE_CMD_READ  0x20
 #define IDE_CMD_WRITE 0x30
 #define IDE_CMD_RDMUL 0xc4
@@ -30,7 +29,6 @@
 
 static struct spinlock idelock;
 static struct buf *idequeue;
-
 static int havedisk1;
 static void idestart(struct buf*);
 
@@ -45,7 +43,6 @@ static int idewait(int checkerr)
     return -1;
   return 0;
 }
-
 void ideinit(void)
 {
   int i;
@@ -67,7 +64,6 @@ void ideinit(void)
   // Switch back to disk 0.
   outb(0x1f6, 0xe0 | (0<<4));
 }
-
 // Start the request for b.  Caller must hold idelock.
 static void idestart(struct buf *b)
 {
@@ -96,7 +92,6 @@ static void idestart(struct buf *b)
     outb(0x1f7, read_cmd);
   }
 }
-
 // Interrupt handler.
 void ideintr(void)
 {
@@ -126,7 +121,6 @@ void ideintr(void)
 
   release(&idelock);
 }
-
 //PAGEBREAK!
 // Sync buf with disk.
 // If B_DIRTY is set, write buf to disk, clear B_DIRTY, set B_VALID.

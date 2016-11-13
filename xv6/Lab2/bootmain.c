@@ -14,8 +14,7 @@
 
 void readseg(uchar*, uint, uint);
 
-void
-bootmain(void)
+void bootmain(void)
 {
   struct elfhdr *elf;
   struct proghdr *ph, *eph;
@@ -40,24 +39,18 @@ bootmain(void)
     if(ph->memsz > ph->filesz)
       stosb(pa + ph->filesz, 0, ph->memsz - ph->filesz);
   }
-
   // Call the entry point from the ELF header.
   // Does not return!
   entry = (void(*)(void))(elf->entry);
   entry();
 }
-
-void
-waitdisk(void)
+void waitdisk(void)
 {
   // Wait for disk ready.
-  while((inb(0x1F7) & 0xC0) != 0x40)
-    ;
+  while((inb(0x1F7) & 0xC0) != 0x40);
 }
-
 // Read a single sector at offset into dst.
-void
-readsect(void *dst, uint offset)
+void readsect(void *dst, uint offset)
 {
   // Issue command.
   waitdisk();
@@ -72,14 +65,11 @@ readsect(void *dst, uint offset)
   waitdisk();
   insl(0x1F0, dst, SECTSIZE/4);
 }
-
 // Read 'count' bytes at 'offset' from kernel into physical address 'pa'.
 // Might copy more than asked.
-void
-readseg(uchar* pa, uint count, uint offset)
+void readseg(uchar* pa, uint count, uint offset)
 {
   uchar* epa;
-
   epa = pa + count;
 
   // Round down to sector boundary.

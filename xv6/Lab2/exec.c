@@ -28,7 +28,6 @@ int exec(char *path, char **argv)
   if(elf.magic != ELF_MAGIC)
     goto bad;
 
-
 // If the setting up the kernel virtual memory does not execute properly, you go to bad switch case.
   if((pgdir = setupkvm()) == 0)
     goto bad;

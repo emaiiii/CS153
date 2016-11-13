@@ -9,8 +9,7 @@ char* strcpy(char *s, char *t)
   char *os;
 
   os = s;
-  while((*s++ = *t++) != 0)
-    ;
+  while((*s++ = *t++) != 0);
   return os;
 }
 int strcmp(const char *p, const char *q)
@@ -23,8 +22,7 @@ uint strlen(char *s)
 {
   int n;
 
-  for(n = 0; s[n]; n++)
-    ;
+  for(n = 0; s[n]; n++);
   return n;
 }
 void* memset(void *dst, int c, uint n)

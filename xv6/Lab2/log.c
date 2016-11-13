@@ -37,19 +37,18 @@ struct logheader {
 };
 
 struct log {
-  struct spinlock lock;
-  int start;
-  int size;
-  int outstanding; // how many FS sys calls are executing.
-  int committing;  // in commit(), please wait.
-  int dev;
-  struct logheader lh;
+  	struct spinlock lock;
+	struct logheader lh;
+  	int start;
+  	int size;
+  	int outstanding; // how many FS sys calls are executing.
+  	int committing;  // in commit(), please wait.
+  	int dev;
 };
 struct log log;
 
 static void recover_from_log(void);
 static void commit();
-
 void initlog(int dev)
 {
   if (sizeof(struct logheader) >= BSIZE)
@@ -63,7 +62,6 @@ void initlog(int dev)
   log.dev = dev;
   recover_from_log();
 }
-
 // Copy committed blocks from log to their home location
 static void install_trans(void)
 {
@@ -78,7 +76,6 @@ static void install_trans(void)
     brelse(dbuf);
   }
 }
-
 // Read the log header from disk into the in-memory log header
 static void read_head(void)
 {
@@ -91,7 +88,6 @@ static void read_head(void)
   }
   brelse(buf);
 }
-
 // Write in-memory log header to disk.
 // This is the true point at which the
 // current transaction commits.
@@ -107,7 +103,6 @@ static void write_head(void)
   bwrite(buf);
   brelse(buf);
 }
-
 static void recover_from_log(void)
 {
   read_head();
@@ -115,7 +110,6 @@ static void recover_from_log(void)
   log.lh.n = 0;
   write_head(); // clear the log
 }
-
 // called at the start of each FS system call.
 void begin_op(void)
 {
@@ -133,7 +127,6 @@ void begin_op(void)
     }
   }
 }
-
 // called at the end of each FS system call.
 // commits if this was the last outstanding operation.
 void end_op(void)

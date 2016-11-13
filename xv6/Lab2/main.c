@@ -38,7 +38,6 @@ int main(void)
   userinit();      // first user process
   mpmain();        // finish this processor's setup
 }
-
 // Other CPUs jump here from entryother.S.
 static void mpenter(void)
 {
@@ -47,7 +46,6 @@ static void mpenter(void)
   lapicinit();
   mpmain();
 }
-
 // Common CPU setup code.
 static void mpmain(void)
 {
@@ -56,9 +54,7 @@ static void mpmain(void)
   xchg(&cpu->started, 1); // tell startothers() we're up
   scheduler();     // start running processes
 }
-
 pde_t entrypgdir[];  // For entry.S
-
 // Start the non-boot (AP) processors.
 static void startothers(void)
 {
@@ -88,11 +84,9 @@ static void startothers(void)
     lapicstartap(c->apicid, V2P(code));
 
     // wait for cpu to finish mpmain()
-    while(c->started == 0)
-      ;
+    while(c->started == 0);
   }
 }
-
 // The boot page table used in entry.S and entryother.S.
 // Page directories (and page tables) must start on page boundaries,
 // hence the __aligned__ attribute.
@@ -105,7 +99,6 @@ pde_t entrypgdir[NPDENTRIES] = {
   // Map VA's [KERNBASE, KERNBASE+4MB) to PA's [0, 4MB)
   [KERNBASE>>PDXSHIFT] = (0) | PTE_P | PTE_W | PTE_PS,
 };
-
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

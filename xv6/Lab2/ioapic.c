@@ -11,7 +11,6 @@
 #define REG_ID     0x00  // Register index: ID
 #define REG_VER    0x01  // Register index: version
 #define REG_TABLE  0x10  // Redirection table base
-
 // The redirection table starts at REG_TABLE and uses
 // two registers to configure each interrupt.
 // The first (low) register in a pair contains configuration bits.
@@ -30,23 +29,17 @@ struct ioapic {
   uint pad[3];
   uint data;
 };
-
-static uint
-ioapicread(int reg)
+static uint ioapicread(int reg)
 {
   ioapic->reg = reg;
   return ioapic->data;
 }
-
-static void
-ioapicwrite(int reg, uint data)
+static void ioapicwrite(int reg, uint data)
 {
   ioapic->reg = reg;
   ioapic->data = data;
 }
-
-void
-ioapicinit(void)
+void ioapicinit(void)
 {
   int i, id, maxintr;
 
@@ -66,13 +59,10 @@ ioapicinit(void)
     ioapicwrite(REG_TABLE+2*i+1, 0);
   }
 }
-
-void
-ioapicenable(int irq, int cpunum)
+void ioapicenable(int irq, int cpunum)
 {
   if(!ismp)
     return;
-
   // Mark interrupt edge-triggered, active high,
   // enabled, and routed to the given cpunum,
   // which happens to be that cpu's APIC ID.

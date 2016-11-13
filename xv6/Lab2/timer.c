@@ -8,7 +8,6 @@
 #include "x86.h"
 
 #define IO_TIMER1       0x040           // 8253 Timer #1
-
 // Frequency of all three count-down timers;
 // (TIMER_FREQ/freq) is the appropriate count
 // to generate a frequency of freq Hz.

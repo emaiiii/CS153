@@ -22,13 +22,11 @@ void ideinit(void)
   memdisk = _binary_fs_img_start;
   disksize = (uint)_binary_fs_img_size/BSIZE;
 }
-
 // Interrupt handler.
 void ideintr(void)
 {
   // no-op
 }
-
 // Sync buf with disk.
 // If B_DIRTY is set, write buf to disk, clear B_DIRTY, set B_VALID.
 // Else if B_VALID is not set, read buf from disk, set B_VALID.

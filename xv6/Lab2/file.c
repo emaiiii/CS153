@@ -20,7 +20,6 @@ void fileinit(void)
 {
   initlock(&ftable.lock, "ftable");
 }
-
 // Allocate a file structure.
 struct file* filealloc(void)
 {
@@ -48,7 +47,6 @@ struct file* filedup(struct file *f)
   release(&ftable.lock);
   return f;
 }
-
 // Close file f.  (Decrement ref count, close when reaches 0.)
 void fileclose(struct file *f)
 {
@@ -74,7 +72,6 @@ void fileclose(struct file *f)
     end_op();
   }
 }
-
 // Get metadata about file f.
 int filestat(struct file *f, struct stat *st)
 {
@@ -86,7 +83,6 @@ int filestat(struct file *f, struct stat *st)
   }
   return -1;
 }
-
 // Read from file f.
 int fileread(struct file *f, char *addr, int n)
 {
@@ -105,7 +101,6 @@ int fileread(struct file *f, char *addr, int n)
   }
   panic("fileread");
 }
-
 //PAGEBREAK!
 // Write to file f.
 int filewrite(struct file *f, char *addr, int n)
