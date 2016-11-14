@@ -1,8 +1,8 @@
 #include "types.h"
 #include "defs.h"
 #include "param.h"
-#include "memlayout.h"
 #include "mmu.h"
+#include "memlayout.h"
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
@@ -90,6 +90,7 @@ void userinit(void)
   p->tf->ss = p->tf->ds;
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
+	cprintf("initcode esp = %x \n", p->tf->esp);
   p->tf->eip = 0;  // beginning of initcode.S
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
@@ -150,8 +151,6 @@ int fork(void)
 	pid = np->pid;
   	np->state = RUNNABLE;
   	safestrcpy(np->name, proc->name, sizeof(proc->name));
-  	np->priorityValue = 32;
-  	np->wcount = -1;
 
   	return pid;
 }

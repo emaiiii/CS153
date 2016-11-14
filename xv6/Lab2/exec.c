@@ -27,25 +27,20 @@ int exec(char *path, char **argv)
     goto bad;
   if(elf.magic != ELF_MAGIC)
     goto bad;
-
-// If the setting up the kernel virtual memory does not execute properly, you go to bad switch case.
   if((pgdir = setupkvm()) == 0)
     goto bad;
 
   // Load program into memory.
-  sz = 0;
+  sz = PGSIZE;
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
     if(ph.type != ELF_PROG_LOAD)
       continue;
-// If the physical memory size is less than the physical file size, swithc over to bad case
     if(ph.memsz < ph.filesz)
       goto bad;
-// If the allocation of user virtual memory returns a 0, then switch to bad case
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
       goto bad;
-// If loading the user virtual memory does not execute correctly, switch to base case
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
@@ -53,16 +48,14 @@ int exec(char *path, char **argv)
   ip = 0;
 
   // Allocate two pages at the next page boundary.
-  // Make the first inaccessible.  Use the second as the user stack.
   sz = PGROUNDUP(sz);
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
-  proc->pstack = (uint *)sz;
 
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  sp = sz;
 
   // Push argument strings, prepare rest of stack in ustack.
+	sp = sz;
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -97,7 +90,6 @@ int exec(char *path, char **argv)
   freevm(oldpgdir);
   return 0;
 
-// The kernel virtual memory was not set up correctly. If the page directory does exist, you free the virtual memory, then release the ip number and end the process operation.
  bad:
   if(pgdir)
     freevm(pgdir);

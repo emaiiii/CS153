@@ -15,7 +15,7 @@ struct mpconf {         // configuration table header
   ushort length;				// total table length
   ushort oemlength;				// OEM table length
   ushort entry;					// entry count
-  ushort xlength				// extended table length
+  ushort xlength;				// extended table length
   uchar signature[4];           // "PCMP"
   uchar version;                // [14]
   uchar checksum;               // all bytes must add up to 0
@@ -24,7 +24,6 @@ struct mpconf {         // configuration table header
   uchar reserved;
   uint *oemtable;               // OEM table pointer
   uint *lapicaddr;              // address of local APIC
-  uchar xchecksum;              // extended table checksum
 };
 
 struct mpproc {         // processor table entry
