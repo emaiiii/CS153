@@ -1,8 +1,8 @@
-# Lab 2: Concurrency and Memory
+# Lab 2: Memory Management
 
 ##### Handed out Monday, October 30th, 2016
 
-##### Walkthrough due November 15th, 2016
+##### Walkthrough due November 17th, 2016
 
 ##### Due Thuesday December 1st, 2016
 
