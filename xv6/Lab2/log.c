@@ -37,19 +37,21 @@ struct logheader {
 };
 
 struct log {
-  	struct spinlock lock;
-	struct logheader lh;
-  	int start;
-  	int size;
-  	int outstanding; // how many FS sys calls are executing.
-  	int committing;  // in commit(), please wait.
-  	int dev;
+  struct spinlock lock;
+  int start;
+  int size;
+  int outstanding; // how many FS sys calls are executing.
+  int committing;  // in commit(), please wait.
+  int dev;
+  struct logheader lh;
 };
 struct log log;
 
 static void recover_from_log(void);
 static void commit();
-void initlog(int dev)
+
+void
+initlog(int dev)
 {
   if (sizeof(struct logheader) >= BSIZE)
     panic("initlog: too big logheader");
@@ -62,8 +64,10 @@ void initlog(int dev)
   log.dev = dev;
   recover_from_log();
 }
+
 // Copy committed blocks from log to their home location
-static void install_trans(void)
+static void
+install_trans(void)
 {
   int tail;
 
@@ -76,8 +80,10 @@ static void install_trans(void)
     brelse(dbuf);
   }
 }
+
 // Read the log header from disk into the in-memory log header
-static void read_head(void)
+static void
+read_head(void)
 {
   struct buf *buf = bread(log.dev, log.start);
   struct logheader *lh = (struct logheader *) (buf->data);
@@ -88,10 +94,12 @@ static void read_head(void)
   }
   brelse(buf);
 }
+
 // Write in-memory log header to disk.
 // This is the true point at which the
 // current transaction commits.
-static void write_head(void)
+static void
+write_head(void)
 {
   struct buf *buf = bread(log.dev, log.start);
   struct logheader *hb = (struct logheader *) (buf->data);
@@ -103,15 +111,19 @@ static void write_head(void)
   bwrite(buf);
   brelse(buf);
 }
-static void recover_from_log(void)
+
+static void
+recover_from_log(void)
 {
   read_head();
   install_trans(); // if committed, copy from log to disk
   log.lh.n = 0;
   write_head(); // clear the log
 }
+
 // called at the start of each FS system call.
-void begin_op(void)
+void
+begin_op(void)
 {
   acquire(&log.lock);
   while(1){
@@ -127,9 +139,11 @@ void begin_op(void)
     }
   }
 }
+
 // called at the end of each FS system call.
 // commits if this was the last outstanding operation.
-void end_op(void)
+void
+end_op(void)
 {
   int do_commit = 0;
 
@@ -156,8 +170,10 @@ void end_op(void)
     release(&log.lock);
   }
 }
+
 // Copy modified blocks from cache to log.
-static void write_log(void)
+static void
+write_log(void)
 {
   int tail;
 
@@ -170,7 +186,9 @@ static void write_log(void)
     brelse(to);
   }
 }
-static void commit()
+
+static void
+commit()
 {
   if (log.lh.n > 0) {
     write_log();     // Write modified blocks from cache to log
@@ -180,6 +198,7 @@ static void commit()
     write_head();    // Erase the transaction from the log
   }
 }
+
 // Caller has modified b->data and is done with the buffer.
 // Record the block number and pin in the cache with B_DIRTY.
 // commit()/write_log() will do the disk write.
@@ -189,7 +208,8 @@ static void commit()
 //   modify bp->data[]
 //   log_write(bp)
 //   brelse(bp)
-void log_write(struct buf *b)
+void
+log_write(struct buf *b)
 {
   int i;
 
@@ -209,3 +229,4 @@ void log_write(struct buf *b)
   b->flags |= B_DIRTY; // prevent eviction
   release(&log.lock);
 }
+

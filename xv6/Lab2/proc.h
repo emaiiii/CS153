@@ -52,21 +52,23 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
-	uint sz;                    // Size of process memory (bytes)
-	uint *pstack;
-	pde_t* pgdir;               // Page table
-	char *kstack;               // Bottom of kernel stack for this process
-	char name[16];				// Process name (debugging)
-	enum procstate state;       // Process state
-	int pid;                    // Process ID
-	int killed;					// If non-zero, have been killed
-	int status;					// Exit Status
-	struct proc *parent;        // Parent process
-	struct trapframe *tf;       // Trap frame for current syscall
-	struct context *context;    // swtch() here to run process
-	struct file *ofile[NOFILE]; // Open files
-	struct inode *cwd;          // Current directory
-	void *chan;					// If non-zero, sleeping on chan
+  uint sz;                     // Size of process memory (bytes)
+  pde_t* pgdir;                // Page table
+  char *kstack;                // Bottom of kernel stack for this process
+  enum procstate state;        // Process state
+  int pid;                     // Process ID
+  struct proc *parent;         // Parent process
+  struct trapframe *tf;        // Trap frame for current syscall
+  struct context *context;     // swtch() here to run process
+  void *chan;                  // If non-zero, sleeping on chan
+  int killed;                  // If non-zero, have been killed
+  struct file *ofile[NOFILE];  // Open files
+  struct inode *cwd;           // Current directory
+  char name[16];               // Process name (debugging)
+  int status;		       // Exit Status
+  struct proc* wpid[20];	// The waiting list of processes
+  int wcount;			// The number of Processes waiting
+  int priorityValue;
 };
 
 // Process memory is laid out contiguously, low addresses first:

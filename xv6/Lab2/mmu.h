@@ -23,6 +23,7 @@
 #define FL_VIF          0x00080000      // Virtual Interrupt Flag
 #define FL_VIP          0x00100000      // Virtual Interrupt Pending
 #define FL_ID           0x00200000      // ID flag
+
 // Control Register flags
 #define CR0_PE          0x00000001      // Protection Enable
 #define CR0_MP          0x00000002      // Monitor coProcessor
@@ -35,6 +36,7 @@
 #define CR0_NW          0x20000000      // Not Writethrough
 #define CR0_CD          0x40000000      // Cache Disable
 #define CR0_PG          0x80000000      // Paging
+
 #define CR4_PSE         0x00000010      // Page size extension
 
 // various segment selectors.
@@ -44,6 +46,7 @@
 #define SEG_UCODE 4  // user code
 #define SEG_UDATA 5  // user data+stack
 #define SEG_TSS   6  // this process's task state
+
 // cpu->gdt[NSEGS] holds the above segments.
 #define NSEGS     7
 
@@ -65,6 +68,7 @@ struct segdesc {
   uint g : 1;          // Granularity: limit scaled by 4K when set
   uint base_31_24 : 8; // High bits of segment base address
 };
+
 // Normal segment
 #define SEG(type, base, lim, dpl) (struct segdesc)    \
 { ((lim) >> 12) & 0xffff, (uint)(base) & 0xffff,      \
@@ -77,6 +81,7 @@ struct segdesc {
 #endif
 
 #define DPL_USER    0x3     // User DPL
+
 // Application segment type bits
 #define STA_X       0x8     // Executable segment
 #define STA_E       0x4     // Expand down (non-executable segments)
@@ -84,6 +89,7 @@ struct segdesc {
 #define STA_W       0x2     // Writeable (non-executable segments)
 #define STA_R       0x2     // Readable (executable segments)
 #define STA_A       0x1     // Accessed
+
 // System segment type bits
 #define STS_T16A    0x1     // Available 16-bit TSS
 #define STS_LDT     0x2     // Local Descriptor Table
@@ -108,8 +114,10 @@ struct segdesc {
 
 // page directory index
 #define PDX(va)         (((uint)(va) >> PDXSHIFT) & 0x3FF)
+
 // page table index
 #define PTX(va)         (((uint)(va) >> PTXSHIFT) & 0x3FF)
+
 // construct virtual address from indexes and offset
 #define PGADDR(d, t, o) ((uint)((d) << PDXSHIFT | (t) << PTXSHIFT | (o)))
 
@@ -117,9 +125,11 @@ struct segdesc {
 #define NPDENTRIES      1024    // # directory entries per page directory
 #define NPTENTRIES      1024    // # PTEs per page table
 #define PGSIZE          4096    // bytes mapped by a page
+
 #define PGSHIFT         12      // log2(PGSIZE)
 #define PTXSHIFT        12      // offset of PTX in a linear address
 #define PDXSHIFT        22      // offset of PDX in a linear address
+
 #define PGROUNDUP(sz)  (((sz)+PGSIZE-1) & ~(PGSIZE-1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
 
@@ -145,8 +155,15 @@ typedef uint pte_t;
 struct taskstate {
   uint link;         // Old ts selector
   uint esp0;         // Stack pointers and segment selectors
+  ushort ss0;        //   after an increase in privilege level
+  ushort padding1;
   uint *esp1;
+  ushort ss1;
+  ushort padding2;
   uint *esp2;
+  ushort ss2;
+  ushort padding3;
+  void *cr3;         // Page directory base
   uint *eip;         // Saved state from last task switch
   uint eflags;
   uint eax;          // More saved state (registers)
@@ -158,9 +175,6 @@ struct taskstate {
   uint esi;
   uint edi;
   ushort es;         // Even more saved state (segment selectors)
-  ushort padding1;
-  ushort padding2;
-  ushort padding3;
   ushort padding4;
   ushort cs;
   ushort padding5;
@@ -174,12 +188,8 @@ struct taskstate {
   ushort padding9;
   ushort ldt;
   ushort padding10;
-  ushort ss0;		//after an increase in privilege level
-  ushort ss1;
-  ushort ss2;
   ushort t;          // Trap on task switch
   ushort iomb;       // I/O map base address
-  void *cr3;		// Page directory base
 };
 
 // PAGEBREAK: 12

@@ -2,9 +2,8 @@ struct stat;
 struct rtcdate;
 
 // system calls
-void exit(int ) __attribute__((noreturn));
-char* sbrk(int);
 int fork(void);
+void exit(int ) __attribute__((noreturn));
 int wait(int *);
 int waitpid(int, int *, int);
 int pipe(int*);
@@ -22,20 +21,20 @@ int mkdir(char*);
 int chdir(char*);
 int dup(int);
 int getpid(void);
+char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int functPriority(int);
-int* v2p(int, int*);
 // ulib.c
 int stat(char*, struct stat*);
-int strcmp(const char*, const char*);
-int atoi(const char*);
 char* strcpy(char*, char*);
-char* gets(char*, int max);
-char* strchr(const char*, char);
 void *memmove(void*, void*, int);
+char* strchr(const char*, char c);
+int strcmp(const char*, const char*);
 void printf(int, char*, ...);
+char* gets(char*, int max);
+uint strlen(char*);
 void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
-uint strlen(char*);
+int atoi(const char*);

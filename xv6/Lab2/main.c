@@ -14,7 +14,8 @@ extern char end[]; // first address after kernel loaded from ELF file
 // Bootstrap processor starts running C code here.
 // Allocate a real stack and switch to it, first
 // doing some setup required for memory allocator to work.
-int main(void)
+int
+main(void)
 {
   kinit1(end, P2V(4*1024*1024)); // phys page allocator
   kvmalloc();      // kernel page table
@@ -38,25 +39,32 @@ int main(void)
   userinit();      // first user process
   mpmain();        // finish this processor's setup
 }
+
 // Other CPUs jump here from entryother.S.
-static void mpenter(void)
+static void
+mpenter(void)
 {
   switchkvm();
   seginit();
   lapicinit();
   mpmain();
 }
+
 // Common CPU setup code.
-static void mpmain(void)
+static void
+mpmain(void)
 {
   cprintf("cpu%d: starting\n", cpunum());
   idtinit();       // load idt register
   xchg(&cpu->started, 1); // tell startothers() we're up
   scheduler();     // start running processes
 }
+
 pde_t entrypgdir[];  // For entry.S
+
 // Start the non-boot (AP) processors.
-static void startothers(void)
+static void
+startothers(void)
 {
   extern uchar _binary_entryother_start[], _binary_entryother_size[];
   uchar *code;
@@ -84,9 +92,11 @@ static void startothers(void)
     lapicstartap(c->apicid, V2P(code));
 
     // wait for cpu to finish mpmain()
-    while(c->started == 0);
+    while(c->started == 0)
+      ;
   }
 }
+
 // The boot page table used in entry.S and entryother.S.
 // Page directories (and page tables) must start on page boundaries,
 // hence the __aligned__ attribute.
@@ -99,6 +109,7 @@ pde_t entrypgdir[NPDENTRIES] = {
   // Map VA's [KERNBASE, KERNBASE+4MB) to PA's [0, 4MB)
   [KERNBASE>>PDXSHIFT] = (0) | PTE_P | PTE_W | PTE_PS,
 };
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

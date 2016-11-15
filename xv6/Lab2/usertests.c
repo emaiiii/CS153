@@ -36,6 +36,7 @@ void iputtest(void)
   }
   printf(stdout, "iput test ok\n");
 }
+
 // does exit() call iput(p->cwd) in a transaction?
 void exitiputtest(void)
 {
@@ -66,6 +67,7 @@ void exitiputtest(void)
   wait(0);
   printf(stdout, "exitiput test ok\n");
 }
+
 // does the error path in open() for attempt to write a
 // directory call iput() in a transaction?
 // needs a hacked kernel that pauses just after the namei()
@@ -107,7 +109,9 @@ void openiputtest(void)
   wait(0);
   printf(stdout, "openiput test ok\n");
 }
+
 // simple file system tests
+
 void opentest(void)
 {
   int fd;
@@ -126,6 +130,7 @@ void opentest(void)
   }
   printf(stdout, "open test ok\n");
 }
+
 void writetest(void)
 {
   int fd;
@@ -173,6 +178,7 @@ void writetest(void)
   }
   printf(stdout, "small file test ok\n");
 }
+
 void writetest1(void)
 {
   int i, fd, n;
@@ -228,6 +234,7 @@ void writetest1(void)
   }
   printf(stdout, "big files ok\n");
 }
+
 void createtest(void)
 {
   int i, fd;
@@ -249,6 +256,7 @@ void createtest(void)
   }
   printf(stdout, "many creates, followed by unlink; ok\n");
 }
+
 void dirtest(void)
 {
   printf(stdout, "mkdir test\n");
@@ -274,6 +282,7 @@ void dirtest(void)
   }
   printf(stdout, "mkdir test ok\n");
 }
+
 void exectest(void)
 {
   printf(stdout, "exec test\n");
@@ -282,7 +291,9 @@ void exectest(void)
     exit(1);
   }
 }
+
 // simple fork and pipe read/write
+
 void pipe1(void)
 {
   int fds[2], pid;
@@ -333,6 +344,7 @@ void pipe1(void)
   }
   printf(1, "pipe1 ok\n");
 }
+
 // meant to be run w/ at most two CPUs
 void preempt(void)
 {
@@ -377,6 +389,7 @@ void preempt(void)
   wait(0);
   printf(1, "preempt ok\n");
 }
+
 // try to find any races between exit and wait
 void exitwait(void)
 {
@@ -399,6 +412,7 @@ void exitwait(void)
   }
   printf(1, "exitwait ok\n");
 }
+
 void mem(void)
 {
   void *m1, *m2;
@@ -430,7 +444,9 @@ void mem(void)
     wait(0);
   }
 }
+
 // More file system tests
+
 // two processes write to the same file descriptor
 // is the offset shared? does inode locking work?
 void sharedfd(void)
@@ -482,6 +498,7 @@ void sharedfd(void)
     exit(1);
   }
 }
+
 // four processes write different files at the same
 // time, to test block allocation.
 void fourfiles(void)
@@ -547,6 +564,7 @@ void fourfiles(void)
 
   printf(1, "fourfiles ok\n");
 }
+
 // four processes create and delete different files in same directory
 void createdelete(void)
 {
@@ -618,6 +636,7 @@ void createdelete(void)
 
   printf(1, "createdelete ok\n");
 }
+
 // can I unlink a file and still read it?
 void unlinkread(void)
 {
@@ -722,6 +741,7 @@ void linktest(void)
 
   printf(1, "linktest ok\n");
 }
+
 // test concurrent create/link/unlink of the same file
 void concreate(void)
 {
@@ -812,6 +832,7 @@ void concreate(void)
 
   printf(1, "concreate ok\n");
 }
+
 // another concurrent link/unlink/create test,
 // to look for deadlocks.
 void linkunlink()
@@ -846,6 +867,7 @@ void linkunlink()
 
   printf(1, "linkunlink ok\n");
 }
+
 // directory that uses indirect blocks
 void bigdir(void)
 {
@@ -887,6 +909,7 @@ void bigdir(void)
 
   printf(1, "bigdir ok\n");
 }
+
 void subdir(void)
 {
   int fd, cc;

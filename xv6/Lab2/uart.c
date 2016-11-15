@@ -15,7 +15,9 @@
 #define COM1    0x3f8
 
 static int uart;    // is there a uart?
-void uartinit(void)
+
+void
+uartinit(void)
 {
   char *p;
 
@@ -46,7 +48,9 @@ void uartinit(void)
   for(p="xv6...\n"; *p; p++)
     uartputc(*p);
 }
-void uartputc(int c)
+
+void
+uartputc(int c)
 {
   int i;
 
@@ -56,7 +60,9 @@ void uartputc(int c)
     microdelay(10);
   outb(COM1+0, c);
 }
-static int uartgetc(void)
+
+static int
+uartgetc(void)
 {
   if(!uart)
     return -1;
@@ -64,7 +70,9 @@ static int uartgetc(void)
     return -1;
   return inb(COM1+0);
 }
-void uartintr(void)
+
+void
+uartintr(void)
 {
   consoleintr(uartgetc);
 }

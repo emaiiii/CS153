@@ -18,7 +18,9 @@ struct pipe {
   int readopen;   // read fd is still open
   int writeopen;  // write fd is still open
 };
-int pipealloc(struct file **f0, struct file **f1)
+
+int
+pipealloc(struct file **f0, struct file **f1)
 {
   struct pipe *p;
 
@@ -53,7 +55,9 @@ int pipealloc(struct file **f0, struct file **f1)
     fileclose(*f1);
   return -1;
 }
-void pipeclose(struct pipe *p, int writable)
+
+void
+pipeclose(struct pipe *p, int writable)
 {
   acquire(&p->lock);
   if(writable){
@@ -69,8 +73,10 @@ void pipeclose(struct pipe *p, int writable)
   } else
     release(&p->lock);
 }
+
 //PAGEBREAK: 40
-int pipewrite(struct pipe *p, char *addr, int n)
+int
+pipewrite(struct pipe *p, char *addr, int n)
 {
   int i;
 
@@ -90,7 +96,9 @@ int pipewrite(struct pipe *p, char *addr, int n)
   release(&p->lock);
   return n;
 }
-int piperead(struct pipe *p, char *addr, int n)
+
+int
+piperead(struct pipe *p, char *addr, int n)
 {
   int i;
 

@@ -7,7 +7,8 @@
 #include "x86.h"
 #include "elf.h"
 
-int exec(char *path, char **argv)
+int
+exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
@@ -15,10 +16,14 @@ int exec(char *path, char **argv)
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
-  pde_t *pgdir, *oldpgdir;  // the new page directory and the old page directory
+  pde_t *pgdir, *oldpgdir;
 
-  if((ip = namei(path)) == 0)
+  begin_op();
+
+  if((ip = namei(path)) == 0){
+    end_op();
     return -1;
+  }
   ilock(ip);
   pgdir = 0;
 
@@ -32,7 +37,7 @@ int exec(char *path, char **argv)
     goto bad;
 
   // Load program into memory.
-  sz = PGSIZE;
+  sz = 0;
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -40,24 +45,28 @@ int exec(char *path, char **argv)
       continue;
     if(ph.memsz < ph.filesz)
       goto bad;
+    if(ph.vaddr + ph.memsz < ph.vaddr)
+      goto bad;
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
+      goto bad;
+    if(ph.vaddr % PGSIZE != 0)
       goto bad;
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
+  end_op();
   ip = 0;
 
   // Allocate two pages at the next page boundary.
+  // Make the first inaccessible.  Use the second as the user stack.
   sz = PGROUNDUP(sz);
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
-  proc->pstack = (uint *)sz;	
-  
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
+  sp = sz;
 
   // Push argument strings, prepare rest of stack in ustack.
-	sp = sz;
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -95,7 +104,9 @@ int exec(char *path, char **argv)
  bad:
   if(pgdir)
     freevm(pgdir);
-  if(ip)
+  if(ip){
     iunlockput(ip);
+    end_op();
+  }
   return -1;
 }

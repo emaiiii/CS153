@@ -24,7 +24,8 @@ static struct {
   int locking;
 } cons;
 
-static void printint(int xx, int base, int sign)
+static void
+printint(int xx, int base, int sign)
 {
   static char digits[] = "0123456789abcdef";
   char buf[16];
@@ -48,8 +49,10 @@ static void printint(int xx, int base, int sign)
     consputc(buf[i]);
 }
 //PAGEBREAK: 50
+
 // Print to the console. only understands %d, %x, %p, %s.
-void cprintf(char *fmt, ...)
+void
+cprintf(char *fmt, ...)
 {
   int i, c, locking;
   uint *argp;
@@ -99,7 +102,9 @@ void cprintf(char *fmt, ...)
   if(locking)
     release(&cons.lock);
 }
-void panic(char *s)
+
+void
+panic(char *s)
 {
   int i;
   uint pcs[10];
@@ -116,12 +121,14 @@ void panic(char *s)
   for(;;)
     ;
 }
+
 //PAGEBREAK: 50
 #define BACKSPACE 0x100
 #define CRTPORT 0x3d4
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
 
-static void cgaputc(int c)
+static void
+cgaputc(int c)
 {
   int pos;
 
@@ -153,7 +160,9 @@ static void cgaputc(int c)
   outb(CRTPORT+1, pos);
   crt[pos] = ' ' | 0x0700;
 }
-void consputc(int c)
+
+void
+consputc(int c)
 {
   if(panicked){
     cli();
@@ -178,7 +187,8 @@ struct {
 
 #define C(x)  ((x)-'@')  // Control-x
 
-void consoleintr(int (*getc)(void))
+void
+consoleintr(int (*getc)(void))
 {
   int c, doprocdump = 0;
 
@@ -220,7 +230,9 @@ void consoleintr(int (*getc)(void))
     procdump();  // now call procdump() wo. cons.lock held
   }
 }
-int consoleread(struct inode *ip, char *dst, int n)
+
+int
+consoleread(struct inode *ip, char *dst, int n)
 {
   uint target;
   int c;
@@ -256,7 +268,9 @@ int consoleread(struct inode *ip, char *dst, int n)
 
   return target - n;
 }
-int consolewrite(struct inode *ip, char *buf, int n)
+
+int
+consolewrite(struct inode *ip, char *buf, int n)
 {
   int i;
 
@@ -269,7 +283,9 @@ int consolewrite(struct inode *ip, char *buf, int n)
 
   return n;
 }
-void consoleinit(void)
+
+void
+consoleinit(void)
 {
   initlock(&cons.lock, "console");
 
@@ -280,3 +296,4 @@ void consoleinit(void)
   picenable(IRQ_KBD);
   ioapicenable(IRQ_KBD, 0);
 }
+

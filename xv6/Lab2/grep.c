@@ -7,7 +7,8 @@
 char buf[1024];
 int match(char*, char*);
 
-void grep(char *pattern, int fd)
+void
+grep(char *pattern, int fd)
 {
   int n, m;
   char *p, *q;
@@ -33,7 +34,9 @@ void grep(char *pattern, int fd)
     }
   }
 }
-int main(int argc, char *argv[])
+
+int
+main(int argc, char *argv[])
 {
   int fd, i;
   char *pattern;
@@ -59,11 +62,15 @@ int main(int argc, char *argv[])
   }
   exit(1);
 }
+
 // Regexp matcher from Kernighan & Pike,
 // The Practice of Programming, Chapter 9.
+
 int matchhere(char*, char*);
 int matchstar(int, char*, char*);
-int match(char *re, char *text)
+
+int
+match(char *re, char *text)
 {
   if(re[0] == '^')
     return matchhere(re+1, text);
@@ -73,6 +80,7 @@ int match(char *re, char *text)
   }while(*text++ != '\0');
   return 0;
 }
+
 // matchhere: search for re at beginning of text
 int matchhere(char *re, char *text)
 {
@@ -86,6 +94,7 @@ int matchhere(char *re, char *text)
     return matchhere(re+1, text+1);
   return 0;
 }
+
 // matchstar: search for c*re at beginning of text
 int matchstar(int c, char *re, char *text)
 {
@@ -95,3 +104,4 @@ int matchstar(int c, char *re, char *text)
   }while(*text!='\0' && (*text++==c || c=='.'));
   return 0;
 }
+

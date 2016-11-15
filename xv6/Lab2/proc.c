@@ -1,8 +1,8 @@
 #include "types.h"
 #include "defs.h"
 #include "param.h"
-#include "mmu.h"
 #include "memlayout.h"
+#include "mmu.h"
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
@@ -142,16 +142,18 @@ int fork(void)
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
-	for(i = 0; i < NOFILE; i++)
-		if(proc->ofile[i])
-			np->ofile[i] = filedup(proc->ofile[i]);
+  for(i = 0; i < NOFILE; i++)
+  {
+    if(proc->ofile[i]){np->ofile[i] = filedup(proc->ofile[i]);}
+  }
   np->cwd = idup(proc->cwd);
-  
-	pid = np->pid;
-  	np->state = RUNNABLE;
-  	safestrcpy(np->name, proc->name, sizeof(proc->name));
+  pid = np->pid;
+  np->state = RUNNABLE;
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
+  np->priorityValue = 32;
+  np->wcount = -1;
 
-  	return pid;
+  return pid;
 }
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
@@ -159,7 +161,7 @@ int fork(void)
 void exit(int status)
 {
   struct proc *p;
-  int fd;
+  int fd, i;
   if(proc == initproc)
     panic("init exiting");
 
@@ -178,6 +180,10 @@ void exit(int status)
   // Parent might be sleeping in wait(). Please don't wake them up. They might get angry. It's been 
   // a long day.
   wakeup1(proc->parent);
+  if(proc->wcount != 1) {
+	for(i = 0; i <= proc->wcount; ++i)
+		{wakeup1(proc->wpid[i]);}
+  }
 
   // Pass abandoned children to init. They are not allowed to go to a foster house.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -255,7 +261,6 @@ void scheduler(void)
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE){continue;}
-	
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -266,7 +271,7 @@ void scheduler(void)
       switchkvm();
 
       // Process is done running for now.
-      // It should have changed itnt sys_uptime(void)
+      // It should have changed its p->state before coming back.
       proc = 0;
     }
     release(&ptable.lock);
