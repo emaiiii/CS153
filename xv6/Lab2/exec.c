@@ -27,6 +27,7 @@ int exec(char *path, char **argv)
     goto bad;
   if(elf.magic != ELF_MAGIC)
     goto bad;
+
   if((pgdir = setupkvm()) == 0)
     goto bad;
 
@@ -51,7 +52,8 @@ int exec(char *path, char **argv)
   sz = PGROUNDUP(sz);
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
-
+  proc->pstack = (uint *)sz;	
+  
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
 
   // Push argument strings, prepare rest of stack in ustack.

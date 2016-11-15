@@ -93,8 +93,6 @@ int             fork(void);
 int             growproc(int);
 int             kill(int);
 int				wait(int*);
-int				waitpid(int, int*, int);
-int				functPriority(int);
 int				v2p(int*, int*);
 void			exit(int);
 void            pinit(void);

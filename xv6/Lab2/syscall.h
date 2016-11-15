@@ -21,6 +21,4 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_count  22
-#define SYS_waitpid 23
-#define SYS_functPriority 24
-#define SYS_v2p   25
+#define SYS_v2p   23

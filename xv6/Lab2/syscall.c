@@ -94,8 +94,6 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_waitpid(void);
-extern int sys_functPriority(void);
 
 static int (*syscalls[])(void) = {
 [SYS_v2p]     sys_v2p,
@@ -119,8 +117,6 @@ static int (*syscalls[])(void) = {
 [SYS_unlink]  sys_unlink,
 [SYS_link]    sys_link,
 [SYS_close]   sys_close,
-[SYS_waitpid] sys_waitpid,
-[SYS_functPriority] sys_functPriority,
 };
 
 void syscall(void)

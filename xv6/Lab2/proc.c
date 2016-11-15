@@ -90,7 +90,6 @@ void userinit(void)
   p->tf->ss = p->tf->ds;
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
-	cprintf("initcode esp = %x \n", p->tf->esp);
   p->tf->eip = 0;  // beginning of initcode.S
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
@@ -160,7 +159,7 @@ int fork(void)
 void exit(int status)
 {
   struct proc *p;
-  int fd, i;
+  int fd;
   if(proc == initproc)
     panic("init exiting");
 
@@ -179,10 +178,6 @@ void exit(int status)
   // Parent might be sleeping in wait(). Please don't wake them up. They might get angry. It's been 
   // a long day.
   wakeup1(proc->parent);
-  if(proc->wcount != 1) {
-	for(i = 0; i <= proc->wcount; ++i)
-		{wakeup1(proc->wpid[i]);}
-  }
 
   // Pass abandoned children to init. They are not allowed to go to a foster house.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -241,72 +236,6 @@ int wait(int *status)
     sleep(proc, &ptable.lock);  //DOC: wait-sleep
   }
 }
-// This system call acts like a wait system call but it just has a few additional properties
-// The system call waits for the process with a pid that equals to one provided by the pid argument
-// The return value is the process id of the process that was terminated 
-// -1 if there is no process
-int waitpid(int pid, int *status, int options)
-{
-	int have;
-	struct proc *p;
-	acquire (&ptable.lock);
-	for(;;)
-	{
-		have = 0;
-		for(p = ptable.proc; &ptable.proc[NPROC] > p; ++p)
-		{
-			if(pid != p->pid){continue;}
-			have = 1;
-			// Clear the process if our child
-			if(p->state == ZOMBIE)
-			{
-				if(p->status != 0){*status = p->status;}
-				pid = p->pid;
-				kfree(p->kstack);
-				p->kstack = 0;
-				freevm(p->pgdir);
-				p->pid = 0;
-				p->parent = 0;
-				p->killed = 0;
-				p->name[0] = 0;
-				p->state = UNUSED;
-				release(&ptable.lock);
-				return pid;
-			}
-			else
-			{
-				p->wcount++;
-				p->wpid[p->wcount] = proc;
-			}
-		}
-		//What is the point of waiting if there is no process?
-		if(!have || proc->killed)
-		{
-			release(&ptable.lock);
-			return -1;
-		}
-		//Wait for the process to exit. Go ahead and take a nap.
-		sleep(proc, &ptable.lock);
-	}	
-}
-int get_priority(void)
-{
-  struct proc *wp;	// the current process
-  int top = 65000;		// initialize the top priority to the lowest priority num (top of the waitlist)
-	acquire(&ptable.lock);
-  for(wp = ptable.proc; wp < &ptable.proc[NPROC]; wp++)		// iterate through the ptable
-  {
-    if(wp->state != RUNNABLE){continue;}
-	if(top == 0){top = wp->priorityValue;}
-	else{
-		if(wp->priorityValue < top)		// check for a process with a higher priority
-		{top = wp->priorityValue;}		// set top to the new highest priority}
-	}
-	}
-
-	release(&ptable.lock);
-  return top;
-}
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -318,7 +247,6 @@ int get_priority(void)
 void scheduler(void)
 {
   struct proc *p;
-  int top = 0;
 
   for(;;){
     // Enable interrupts on this processor.
@@ -328,10 +256,6 @@ void scheduler(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE){continue;}
 	
-	release(&ptable.lock);
-	top = get_priority();
-	acquire(&ptable.lock);
-	if(top < p->priorityValue){p->priorityValue = top;}
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -497,13 +421,6 @@ void procdump(void)
     }
     cprintf("\n");
   }
-}
-int functPriority(int priorityNumber)
-{
-	if(priorityNumber < 0){priorityNumber = 0;}
-	if(priorityNumber > 63){priorityNumber = 63;}
-	proc->priorityValue = priorityNumber;
-	return 0;
 }
 int v2p(int *virtual, int *physical)
 {

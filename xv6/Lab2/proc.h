@@ -61,14 +61,11 @@ struct proc {
 	int pid;                    // Process ID
 	int killed;					// If non-zero, have been killed
 	int status;					// Exit Status
-	int wcount;					// The number of processes waiting
-	int priorityValue;			// priority of the process
 	struct proc *parent;        // Parent process
 	struct trapframe *tf;       // Trap frame for current syscall
 	struct context *context;    // swtch() here to run process
 	struct file *ofile[NOFILE]; // Open files
 	struct inode *cwd;          // Current directory
-  	struct proc* wpid[20];		// The waiting list of processes
 	void *chan;					// If non-zero, sleeping on chan
 };
 

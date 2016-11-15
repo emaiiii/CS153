@@ -22,14 +22,6 @@ int sys_wait(void)
 	int *value;
 	if(argptr(0, (char**)&value, sizeof(value)) < 0){return -1;}
  	return wait(value);
-}
-int sys_waitpid(void)
-{
-	int pid, options, *status;
-	if(0 > argint(0, &pid)){return -1;}
-	if(0 > argptr(1, (char**)&status, sizeof(status))){return -1;}
-	if(argint(2, &options)){return -1;}
-	return waitpid(pid, status, options);
 }	
 int sys_kill(void)
 {
@@ -78,12 +70,6 @@ int sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
-}
-int sys_functPriority(void)		// get the priority
-{
-  int priority;
-  if(0 > argint(0, &priority)){return -1;}
-  return functPriority(priority);
 }
 int sys_v2p(void)
 {
