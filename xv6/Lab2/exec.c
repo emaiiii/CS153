@@ -17,12 +17,9 @@ int exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
 
-  begin_op();
 
-  if((ip = namei(path)) == 0){
-    end_op();
+  if((ip = namei(path)) == 0)
     return -1;
-  }
   ilock(ip);
   pgdir = 0;
   // Check ELF header
@@ -36,9 +33,6 @@ int exec(char *path, char **argv)
 
   // Load program into memory.
   sz = PGSIZE;
-
-	if((sz == allocuvm(pgdir, sz, PGSIZE)) == 0)
-		goto bad;
 
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
@@ -57,7 +51,6 @@ int exec(char *path, char **argv)
       goto bad;
   }
   iunlockput(ip);
-  end_op();
   ip = 0;
 
   // Allocate two pages at the next page boundary.
@@ -108,7 +101,6 @@ int exec(char *path, char **argv)
     freevm(pgdir);
   if(ip){
     iunlockput(ip);
-    end_op();
   }
   return -1;
 }

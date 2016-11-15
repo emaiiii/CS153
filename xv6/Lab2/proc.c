@@ -150,8 +150,6 @@ int fork(void)
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
-  np->priorityValue = 32;
-  np->wcount = -1;
 
   return pid;
 }
