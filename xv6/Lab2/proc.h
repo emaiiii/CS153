@@ -1,6 +1,4 @@
 // Per-CPU state
-
-
 struct cpu {
   uchar apicid;                // Local APIC ID
   struct context *scheduler;   // swtch() here to enter scheduler
@@ -65,10 +63,6 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  int status;		       // Exit Status
-  struct proc* wpid[20];	// The waiting list of processes
-  int wcount;			// The number of Processes waiting
-  int priorityValue;
 };
 
 // Process memory is laid out contiguously, low addresses first:

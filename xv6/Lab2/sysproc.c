@@ -1,6 +1,7 @@
 #include "types.h"
 #include "x86.h"
 #include "defs.h"
+#include "date.h"
 #include "param.h"
 #include "memlayout.h"
 #include "mmu.h"
@@ -12,21 +13,19 @@ int sys_fork(void)
 }
 int sys_exit(void)
 {
-	int status;
-	if(0 > argint(0, &status)) {return -1;}
-	else{exit(status);}
-	return 0; // not reached
+  exit();
+  return 0;  // not reached
 }
 int sys_wait(void)
 {
-	int *value;
-	if(argptr(0, (char**)&value, sizeof(value)) < 0){return -1;}
- 	return wait(value);
-}	
+  return wait();
+}
 int sys_kill(void)
 {
   int pid;
-  if(argint(0, &pid) < 0){return -1;}
+
+  if(argint(0, &pid) < 0)
+    return -1;
   return kill(pid);
 }
 int sys_getpid(void)
@@ -38,9 +37,11 @@ int sys_sbrk(void)
   int addr;
   int n;
 
-  if(argint(0, &n) < 0){return -1;}
+  if(argint(0, &n) < 0)
+    return -1;
   addr = proc->sz;
-  if(growproc(n) < 0){return -1;}
+  if(growproc(n) < 0)
+    return -1;
   return addr;
 }
 int sys_sleep(void)
@@ -48,7 +49,8 @@ int sys_sleep(void)
   int n;
   uint ticks0;
 
-  if(argint(0, &n) < 0){return -1;}
+  if(argint(0, &n) < 0)
+    return -1;
   acquire(&tickslock);
   ticks0 = ticks;
   while(ticks - ticks0 < n){
@@ -66,6 +68,7 @@ int sys_sleep(void)
 int sys_uptime(void)
 {
   uint xticks;
+
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);

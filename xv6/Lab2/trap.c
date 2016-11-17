@@ -14,7 +14,8 @@ extern uint vectors[];  // in vectors.S: array of 256 entry pointers
 struct spinlock tickslock;
 uint ticks;
 
-void tvinit(void)
+void
+tvinit(void)
 {
   int i;
 
@@ -25,21 +26,23 @@ void tvinit(void)
   initlock(&tickslock, "time");
 }
 
-void idtinit(void)
+void
+idtinit(void)
 {
   lidt(idt, sizeof(idt));
 }
 
 //PAGEBREAK: 41
-void trap(struct trapframe *tf)
+void
+trap(struct trapframe *tf)
 {
   if(tf->trapno == T_SYSCALL){
     if(proc->killed)
-      exit(1);
+      exit();
     proc->tf = tf;
     syscall();
     if(proc->killed)
-      exit(1);
+      exit();
     return;
   }
 
@@ -95,7 +98,7 @@ void trap(struct trapframe *tf)
   // (If it is still executing in the kernel, let it keep running
   // until it gets to the regular system call return.)
   if(proc && proc->killed && (tf->cs&3) == DPL_USER)
-    exit(1);
+    exit();
 
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
@@ -104,5 +107,5 @@ void trap(struct trapframe *tf)
 
   // Check if the process has been killed since we yielded
   if(proc && proc->killed && (tf->cs&3) == DPL_USER)
-    exit(1);
+    exit();
 }

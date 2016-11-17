@@ -97,7 +97,7 @@ bootblock: bootasm.S bootmain.c
 	$(CC) $(CFLAGS) -fno-pic -nostdinc -I. -c bootasm.S
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0x7C00 -o bootblock.o bootasm.o bootmain.o
 	$(OBJDUMP) -S bootblock.o > bootblock.asm
-	$(OBJCOPY) -S -O binary -j .text bootblock.o bootblock 
+	$(OBJCOPY) -S -O binary -j .text bootblock.o bootblock
 	./sign.pl bootblock
 
 entryother: entryother.S
@@ -173,9 +173,8 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
-	_nullpointerTest\
-	
-	
+	_nullTest\
+
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
 
@@ -245,7 +244,7 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c\
-	nullpointerTest.c\
+	nullTest.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 

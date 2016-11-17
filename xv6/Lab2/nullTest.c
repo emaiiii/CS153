@@ -8,8 +8,10 @@
 #include "traps.h"
 #include "memlayout.h"
 
-int main(int argc, char ** argv)
+int main()
 {
-	
+	int *pointer = 0;
+	int deref = *pointer;
+	deref = deref;
 	return 0;
 }

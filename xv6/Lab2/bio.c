@@ -53,12 +53,10 @@ void binit(void)
     bcache.head.next = b;
   }
 }
-
 // Look through buffer cache for block on device dev.
 // If not found, allocate a buffer.
 // In either case, return locked buffer.
-static struct buf*
-bget(uint dev, uint blockno)
+static struct buf* bget(uint dev, uint blockno)
 {
   struct buf *b;
 
@@ -73,7 +71,6 @@ bget(uint dev, uint blockno)
       return b;
     }
   }
-
   // Not cached; recycle some unused buffer and clean buffer
   // "clean" because B_DIRTY and not locked means log.c
   // hasn't yet committed the changes to the buffer.
@@ -90,10 +87,8 @@ bget(uint dev, uint blockno)
   }
   panic("bget: no buffers");
 }
-
 // Return a locked buf with the contents of the indicated block.
-struct buf*
-bread(uint dev, uint blockno)
+struct buf* bread(uint dev, uint blockno)
 {
   struct buf *b;
 
@@ -103,7 +98,6 @@ bread(uint dev, uint blockno)
   }
   return b;
 }
-
 // Write b's contents to disk.  Must be locked.
 void bwrite(struct buf *b)
 {
@@ -112,7 +106,6 @@ void bwrite(struct buf *b)
   b->flags |= B_DIRTY;
   iderw(b);
 }
-
 // Release a locked buffer.
 // Move to the head of the MRU list.
 void brelse(struct buf *b)
@@ -138,4 +131,3 @@ void brelse(struct buf *b)
 }
 //PAGEBREAK!
 // Blank page.
-
