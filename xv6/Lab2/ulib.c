@@ -4,53 +4,40 @@
 #include "user.h"
 #include "x86.h"
 
-char*
-strcpy(char *s, char *t)
+char* strcpy(char *s, char *t)
 {
   char *os;
 
   os = s;
-  while((*s++ = *t++) != 0)
-    ;
+  while((*s++ = *t++) != 0);
   return os;
 }
-
-int
-strcmp(const char *p, const char *q)
+int strcmp(const char *p, const char *q)
 {
   while(*p && *p == *q)
     p++, q++;
   return (uchar)*p - (uchar)*q;
 }
-
-uint
-strlen(char *s)
+uint strlen(char *s)
 {
   int n;
 
-  for(n = 0; s[n]; n++)
-    ;
+  for(n = 0; s[n]; n++);
   return n;
 }
-
-void*
-memset(void *dst, int c, uint n)
+void* memset(void *dst, int c, uint n)
 {
   stosb(dst, c, n);
   return dst;
 }
-
-char*
-strchr(const char *s, char c)
+char* strchr(const char *s, char c)
 {
   for(; *s; s++)
     if(*s == c)
       return (char*)s;
   return 0;
 }
-
-char*
-gets(char *buf, int max)
+char* gets(char *buf, int max)
 {
   int i, cc;
   char c;
@@ -66,9 +53,7 @@ gets(char *buf, int max)
   buf[i] = '\0';
   return buf;
 }
-
-int
-stat(char *n, struct stat *st)
+int stat(char *n, struct stat *st)
 {
   int fd;
   int r;
@@ -80,9 +65,7 @@ stat(char *n, struct stat *st)
   close(fd);
   return r;
 }
-
-int
-atoi(const char *s)
+int atoi(const char *s)
 {
   int n;
 
@@ -91,9 +74,7 @@ atoi(const char *s)
     n = n*10 + *s++ - '0';
   return n;
 }
-
-void*
-memmove(void *vdst, void *vsrc, int n)
+void* memmove(void *vdst, void *vsrc, int n)
 {
   char *dst, *src;
 
