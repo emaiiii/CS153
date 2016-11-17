@@ -3,8 +3,7 @@
 #include "user.h"
 #include "fs.h"
 
-char*
-fmtname(char *path)
+char* fmtname(char *path)
 {
   static char buf[DIRSIZ+1];
   char *p;
@@ -21,9 +20,7 @@ fmtname(char *path)
   memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
   return buf;
 }
-
-void
-ls(char *path)
+void ls(char *path)
 {
   char buf[512], *p;
   int fd;
@@ -69,9 +66,7 @@ ls(char *path)
   }
   close(fd);
 }
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int i;
 

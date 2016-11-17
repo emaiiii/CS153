@@ -16,8 +16,7 @@ int ismp;
 int ncpu;
 uchar ioapicid;
 
-static uchar
-sum(uchar *addr, int len)
+static uchar sum(uchar *addr, int len)
 {
   int i, sum;
 
@@ -26,10 +25,8 @@ sum(uchar *addr, int len)
     sum += addr[i];
   return sum;
 }
-
 // Look for an MP structure in the len bytes at addr.
-static struct mp*
-mpsearch1(uint a, int len)
+static struct mp* mpsearch1(uint a, int len)
 {
   uchar *e, *p, *addr;
 
@@ -40,14 +37,12 @@ mpsearch1(uint a, int len)
       return (struct mp*)p;
   return 0;
 }
-
 // Search for the MP Floating Pointer Structure, which according to the
 // spec is in one of the following three locations:
 // 1) in the first KB of the EBDA;
 // 2) in the last KB of system base memory;
 // 3) in the BIOS ROM between 0xE0000 and 0xFFFFF.
-static struct mp*
-mpsearch(void)
+static struct mp* mpsearch(void)
 {
   uchar *bda;
   uint p;
@@ -64,14 +59,12 @@ mpsearch(void)
   }
   return mpsearch1(0xF0000, 0x10000);
 }
-
 // Search for an MP configuration table.  For now,
 // don't accept the default configurations (physaddr == 0).
 // Check for correct signature, calculate the checksum and,
 // if correct, check the version.
 // To do: check extended table checksum.
-static struct mpconf*
-mpconfig(struct mp **pmp)
+static struct mpconf* mpconfig(struct mp **pmp)
 {
   struct mpconf *conf;
   struct mp *mp;
@@ -88,9 +81,7 @@ mpconfig(struct mp **pmp)
   *pmp = mp;
   return conf;
 }
-
-void
-mpinit(void)
+void mpinit(void)
 {
   uchar *p, *e;
   struct mp *mp;

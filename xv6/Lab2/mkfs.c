@@ -42,8 +42,7 @@ uint ialloc(ushort type);
 void iappend(uint inum, void *p, int n);
 
 // convert to intel byte order
-ushort
-xshort(ushort x)
+ushort xshort(ushort x)
 {
   ushort y;
   uchar *a = (uchar*)&y;
@@ -51,9 +50,7 @@ xshort(ushort x)
   a[1] = x >> 8;
   return y;
 }
-
-uint
-xint(uint x)
+uint xint(uint x)
 {
   uint y;
   uchar *a = (uchar*)&y;
@@ -63,9 +60,7 @@ xint(uint x)
   a[3] = x >> 24;
   return y;
 }
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int i, cc, fd;
   uint rootino, inum, off;
@@ -166,9 +161,7 @@ main(int argc, char *argv[])
 
   exit(0);
 }
-
-void
-wsect(uint sec, void *buf)
+void wsect(uint sec, void *buf)
 {
   if(lseek(fsfd, sec * BSIZE, 0) != sec * BSIZE){
     perror("lseek");
@@ -179,9 +172,7 @@ wsect(uint sec, void *buf)
     exit(1);
   }
 }
-
-void
-winode(uint inum, struct dinode *ip)
+void winode(uint inum, struct dinode *ip)
 {
   char buf[BSIZE];
   uint bn;
@@ -193,9 +184,7 @@ winode(uint inum, struct dinode *ip)
   *dip = *ip;
   wsect(bn, buf);
 }
-
-void
-rinode(uint inum, struct dinode *ip)
+void rinode(uint inum, struct dinode *ip)
 {
   char buf[BSIZE];
   uint bn;
@@ -206,9 +195,7 @@ rinode(uint inum, struct dinode *ip)
   dip = ((struct dinode*)buf) + (inum % IPB);
   *ip = *dip;
 }
-
-void
-rsect(uint sec, void *buf)
+void rsect(uint sec, void *buf)
 {
   if(lseek(fsfd, sec * BSIZE, 0) != sec * BSIZE){
     perror("lseek");
@@ -219,9 +206,7 @@ rsect(uint sec, void *buf)
     exit(1);
   }
 }
-
-uint
-ialloc(ushort type)
+uint ialloc(ushort type)
 {
   uint inum = freeinode++;
   struct dinode din;
@@ -233,9 +218,7 @@ ialloc(ushort type)
   winode(inum, &din);
   return inum;
 }
-
-void
-balloc(int used)
+void balloc(int used)
 {
   uchar buf[BSIZE];
   int i;
@@ -251,9 +234,7 @@ balloc(int used)
 }
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
-
-void
-iappend(uint inum, void *xp, int n)
+void iappend(uint inum, void *xp, int n)
 {
   char *p = (char*)xp;
   uint fbn, off, n1;
