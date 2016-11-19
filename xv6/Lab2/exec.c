@@ -60,7 +60,17 @@ exec(char *path, char **argv)
 
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
-  sz = PGROUNDUP(sz);
+  
+//	sm += PGSIZE;
+	sz = PGROUNDUP(sz);
+//	proc->heap_start = sz;
+// proc->grow_stack = 1;
+/* if(allocuvm(pgdir, USERTOP - PGSIZE, USERTOP) == 0)
+		goto bad;
+	proc->grow_stack = 0;
+	sp = USERTOP;
+*/
+
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
@@ -97,6 +107,7 @@ exec(char *path, char **argv)
   proc->sz = sz;
   proc->tf->eip = elf.entry;  // main
   proc->tf->esp = sp;
+// proc->stack_size = PGSIZE;
   switchuvm(proc);
   freevm(oldpgdir);
   return 0;

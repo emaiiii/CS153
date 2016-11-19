@@ -115,6 +115,10 @@ int growproc(int n)
 {
   uint sz;
 
+/* if (sz + n > USERTOP - proc->stack_size - PGSIZE)
+	return -1;
+*/
+
   sz = proc->sz;
   if(n > 0){
     if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
@@ -149,6 +153,7 @@ int fork(void)
   }
   np->sz = proc->sz;
   np->parent = proc;
+// np->stack_size = proc->stack_size;
   *np->tf = *proc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
@@ -291,7 +296,6 @@ void scheduler(void)
       proc = 0;
     }
     release(&ptable.lock);
-
   }
 }
 // Enter scheduler.  Must hold only ptable.lock
