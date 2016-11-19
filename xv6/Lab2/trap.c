@@ -73,6 +73,24 @@ void trap(struct trapframe *tf)
     lapiceoi();
     break;
   //PAGEBREAK: 13
+
+/* case T_PGFLT:
+	cprintf("got a page fault, the error is %d\n", tf->err);
+	if(tf->err == 4 || tf->err == 6){
+		cprintf("attempting to grow stack from %d to %d\n", proc->stack_size, proc->stack_size + PGSIZE);
+		proc->grow_stack = 1;
+		if(allocuvm(proc->pgdir, USERTOP - proc->stack_size - PGSIZE, USERTOP - proc->stack_size) == 0){
+			proc->killed = 1;
+			cprintf("killing (%d)\n", proc->pid);
+		}
+		proc->grow_stack = 0;
+		proc->stack_size = proc->stack_size + PGSIZE;
+		}	else if(tf->err == 5 || tf->err == 7){
+				proc->kiled = 1;
+		}
+		break;
+*/
+
   default:
     if(proc == 0 || (tf->cs&3) == 0){
       // In kernel, it must be our mistake.
