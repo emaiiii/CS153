@@ -63,9 +63,7 @@ struct proc {
   	struct file *ofile[NOFILE];  // Open files
   	struct inode *cwd;           // Current directory
   	char name[16];               // Process name (debugging)
-	int grow_stack;				 // Variable to determine if currently growing stack
-	uint stack_size;		 	 // Process stack size
-	uint heap_start;			 // Starting location of the heap in memory
+	uint stack_top;		 	 	// Process stack size
 };
 
 // Process memory is laid out contiguously, low addresses first:

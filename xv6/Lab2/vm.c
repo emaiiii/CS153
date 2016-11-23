@@ -104,17 +104,6 @@ static int mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
 // (directly addressable from end..P2V(PHYSTOP)).
 // This table defines the kernel's mappings, which are present in
 // every process's page table.
-
-/* static struct kmap{
-	void *p, *e;
-	int perm;
-}	kmap[] = {
-	{(void*)USERTOP,	(void*)0x100000, 	PTE_W},
-	{(void*)0x100000,	data, 				0	},
-	{data,				(void*)PHYSTOP,		PTE_W},
-	{(void*)0xFE000000,	0,					PTE_W},
-};
-*/
 static struct kmap {
   void *virt;
   uint phys_start;
@@ -210,31 +199,12 @@ int loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
 }
 // Allocate page tables and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
-
-
 int allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
   char *mem;
   uint a;
 
-// int stack_start = USERTOP - proc->stack_size - PGSIZE;
-// if(proc->grow_stack == 1){
-//		if(oldsz == stack_start && oldsz < proc->stack_size + PGSIZE)
-//			return 0;
-//		if(stack_start - PGSIZE < proc->sz)
-//			retunr 0;
-//	}	else {
-// //All cases below grow heap
-//	if(newsz > stack_start){
-//		return 0;
-//	}
-// if(newsz > USERTOP)
-//	return 0;
-// if(newsz < oldsz)
-//	return oldsz;
-// }
-
-  if(newsz >= KERNBASE)
+  if(newsz > KERNBASE)
     return 0;
   if(newsz < oldsz)
     return oldsz;
@@ -248,21 +218,9 @@ int allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       return 0;
     }
     memset(mem, 0, PGSIZE);
-
-/* if( a == 0) {
-		mappages(pgdir, (char*)a, PGSIZE, PADDR(mem), 0);
-	}	else {
-		mappages(pgdir, (char*)a, PGSIZE, PADDR(mem), PTE_W|PTE_U);
-	}
-*/
-
-    if(mappages(pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
-      cprintf("allocuvm out of memory (2)\n");
-      deallocuvm(pgdir, newsz, oldsz);
-      kfree(mem);
+    mappages(pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U);
       return 0;
     }
-  }
   return newsz;
 }
 // Deallocate user pages to bring the process size from oldsz to
@@ -300,8 +258,7 @@ void freevm(pde_t *pgdir)
   uint i;
 
   if(pgdir == 0)
-    panic("freevm: no pgdir");
-//	deallocuvm(pgdir, USERTOP, 0);  
+    panic("freevm: no pgdir");  
 	deallocuvm(pgdir, KERNBASE, 0);
   for(i = 0; i < NPDENTRIES; i++){
     if(pgdir[i] & PTE_P){
@@ -322,74 +279,16 @@ void clearpteu(pde_t *pgdir, char *uva)
     panic("clearpteu");
   *pte &= ~PTE_U;
 }
-
+void setpteu(pde_t *pgdir, char *uva)
+{
+	pte_t *pte;
+	if((pte = walkpgdir(pgdir, uva, 0)) == 0)
+		panic("setpteu");
+	*pte |= PTE_U;
+}	
 // Given a parent process's page table, create a copy
 // of it for a child.
-
-/*
-pde_t*
-copyuvm(pde_t *pgdir, uint sz)
-{
-  pde_t *d;
-  pte_t *pte;
-  uint pa, i;
-  char *mem;
-
-  // Copy the code section of process
-  if((d = setupkvm()) == 0)
-    return 0;
-  for(i = PGSIZE; i < proc->heap_start - PGSIZE; i += PGSIZE) {
-  //for (i = PGSIZE; i < sz; i += PGSIZE){
-    if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
-      panic("copyuvm: pte should exist");
-    if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
-    pa = PTE_ADDR(*pte);
-    if((mem = kalloc()) == 0)
-      goto bad;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
-      goto bad;
-  }
-
-  // Copy heap section of process
-  for(i = proc->heap_start; i < sz; i += PGSIZE) {
-  //for (i = PGSIZE; i < sz; i += PGSIZE){
-    if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
-      panic("copyuvm: pte should exist");
-    if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
-    pa = PTE_ADDR(*pte);
-    if((mem = kalloc()) == 0)
-      goto bad;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
-      goto bad;
-  }
-
-  // Copy bottom section of the stack
-  for(i = USERTOP - proc->stack_size; i < USERTOP; i += PGSIZE){
-    if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
-      panic("copyuvm: pte should exist");
-    if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
-    pa = PTE_ADDR(*pte);
-    if((mem = kalloc()) == 0)
-      goto bad;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
-      goto bad;
-  }
-
-return d;
-
-bad:
-  freevm(d);
-  return 0;
-}
-*/
-
-pde_t* copyuvm(pde_t *pgdir, uint sz)
+pde_t* copyuvm(pde_t *pgdir, uint sz, uint stack_top)
 {
   pde_t *d;
   pte_t *pte;
@@ -398,7 +297,7 @@ pde_t* copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
-  for(i = PGSIZE; i < sz; i += PGSIZE){
+  for(i = 0; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
@@ -411,11 +310,48 @@ pde_t* copyuvm(pde_t *pgdir, uint sz)
     if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
       goto bad;
   }
+
+  if(stack_top == 0)
+	return d;
+
+  for(i = stack_top; i < USERTOP; i += PGSIZE){
+	if((pte = walkpgdir(pgdir,(void *) i, 1)) == 0)
+		panic("copyuvmL pte shoudl exist");
+	if(!(*pte & PTE_P))
+		panic("copyuvm: page not present");
+	pa = PTE_ADDR(*pte);
+	flags = PTE_FLAGS(*pte);
+	if((mem = kalloc()) == 0)
+		goto bad;
+	memmove(mem, (char*)P2V(pa), PGSIZE);
+	if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
+		goto bad;
+  }
+
   return d;
 
 bad:
   freevm(d);
   return 0;
+}
+int growstack(pde_t *pgdir, uint sp, uint stack_top)
+{
+	pte_t *pte;
+	uint new_top = stack_top - PGSIZE;
+	if(sp > (stack_top + PGSIZE))
+		return -1;
+
+	if((pte = walkpgdir(pgdir, (void *) new_top, 1)) == 0)
+		return -1;
+	if(*pte & PTE_P)
+		return -1;
+	if(allocuvm(pgdir, new_top, stack_top) == 0)
+		return -1;
+	
+	proc->stack_top = proc->stack_top - PGSIZE;
+	setpteu(proc->pgdir, (char*)(proc->stack_top + PGSIZE));
+	clearpteu(proc->pgdir, (char *)proc->stack_top);
+	return 0;
 }
 //PAGEBREAK!
 // Map user virtual address to kernel address.
