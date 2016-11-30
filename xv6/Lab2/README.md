@@ -1,4 +1,4 @@
-b 2: Memory Management
+#Lab 2: Memory Management
 
 ##### Handed out Monday, October 30th, 2016
 
