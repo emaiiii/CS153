@@ -16,30 +16,29 @@ uint ticks;
 
 void tvinit(void)
 {
-  int i;
+	int i;
 
-  for(i = 0; i < 256; i++)
-    SETGATE(idt[i], 0, SEG_KCODE<<3, vectors[i], 0);
-  SETGATE(idt[T_SYSCALL], 1, SEG_KCODE<<3, vectors[T_SYSCALL], DPL_USER);
+	for(i = 0; i < 256; i++)
+		SETGATE(idt[i], 0, SEG_KCODE<<3, vectors[i], 0);
+	SETGATE(idt[T_SYSCALL], 1, SEG_KCODE<<3, vectors[T_SYSCALL], DPL_USER);
 
-  initlock(&tickslock, "time");
+	initlock(&tickslock, "time");
 }
 void idtinit(void)
 {
-  lidt(idt, sizeof(idt));
+	lidt(idt, sizeof(idt));
 }
-//PAGEBREAK: 41
 void trap(struct trapframe *tf)
-{
-  if(tf->trapno == T_SYSCALL){
-    if(proc->killed)
-      exit();
-    proc->tf = tf;
-    syscall();
-    if(proc->killed)
-      exit();
-    return;
-  }
+{	
+	if(tf->trapno == T_SYSCALL){
+		if(proc->killed)
+			exit();
+		proc->tf = tf;
+		syscall();
+		if(proc->killed)
+			exit();
+    	return;
+	}
 
   switch(tf->trapno){
   case T_IRQ0 + IRQ_TIMER:
@@ -72,14 +71,18 @@ void trap(struct trapframe *tf)
             cpunum(), tf->cs, tf->eip);
     lapiceoi();
     break;
-  //PAGEBREAK: 13
 	case T_PGFLT:
-		if(growstack(proc->pgdir, proc->tf->esp, proc->stack_top) == 0)
-			break;
-		cprintf("pid %d %s: page fault on %d eip 0x%x ", proc->pid, proc->name, cpu->apicid, tf->eip);
-		cprintf("stack 0x%x sz 0x%x addr 0x%x\n", proc->stack_top, proc->sz, rcr2());
-		if(proc->tf->esp > proc->sz)
-			deallocuvm(proc->pgdir, USERTOP, proc->stack_top);
+		if(((proc->stack_top) - PGSIZE < rcr2()) && (proc->stack_top > rcr2()))
+		{
+			if(((proc->sz) + PGSIZE) < rcr2()) 
+			{
+				if((allocuvm(proc->pgdir, (proc->stack_top) - PGSIZE, proc->stack_top)) != 0)
+				{
+					proc->stack_top = (proc->stack_top) - PGSIZE;
+					return;
+				}
+			}
+		}
 		proc->killed = 1;
 		break;
 
