@@ -2,7 +2,7 @@
 
 Part 1: Memory Translation System Call
 
-proc.c: 
+proc.c
 	Function added called v2p which translate the virtual address into the physical address
 	Lines: 413-427
 
@@ -23,5 +23,14 @@ syscall.h
 	Lines: 23
 
 Part 2: Null Pointer Dereference
+
+Makefile
+	On line 136 and line 143 changed the starting page of forktest and _% to 0x1000 instead of 0
+	
+exec.c
+	Allocated a page of memory for NULL
+	Lines: 36-40
+
+Part 3: Stack Rearrangement
 
 
