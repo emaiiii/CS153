@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[])
 {
-	int fd, i, status;
+	int fd, i;
 	char path[] = "stressfs0";
 	char data[512];
 
@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
 	for (i = 0; i < 20; i++)
 		read(fd, data, sizeof(data));
 	close(fd);
-	wait(&status);
+	wait();
 	exit();
 }

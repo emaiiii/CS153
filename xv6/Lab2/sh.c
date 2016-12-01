@@ -12,20 +12,18 @@
 #define MAXARGS 10
 
 struct cmd {
-  int type;
+	int type;
 };
 struct execcmd {
-  int type;
-  char *argv[MAXARGS];
-  char *eargv[MAXARGS];
+	int type;
+	char *argv[MAXARGS];
+	char *eargv[MAXARGS];
 };
 struct redircmd {
-  int type;
-  struct cmd *cmd;
-  char *file;
-  char *efile;
-  int mode;
-  int fd;
+	int type, mode, fd;
+	struct cmd *cmd;
+	char *file;
+	char *efile;
 };
 struct pipecmd {
   int type;
@@ -49,7 +47,7 @@ struct cmd *parsecmd(char*);
 // Execute cmd.  Never returns.
 void runcmd(struct cmd *cmd)
 {
-	int p[2], status;
+	int p[2];
 	struct backcmd *bcmd;
 	struct execcmd *ecmd;
 	struct listcmd *lcmd;
@@ -83,7 +81,7 @@ void runcmd(struct cmd *cmd)
 			lcmd = (struct listcmd*)cmd;
 			if(fork1() == 0)
 				runcmd(lcmd->left);
-			wait(&status);
+			wait();
 			runcmd(lcmd->right);
 			break;
 		case PIPE:
@@ -106,8 +104,8 @@ void runcmd(struct cmd *cmd)
 			}
 			close(p[0]);
 			close(p[1]);
-			wait(&status);
-			wait(&status);
+			wait();
+			wait();
 			break;
 		case BACK:
 			bcmd = (struct backcmd*)cmd;
@@ -129,7 +127,7 @@ int getcmd(char *buf, int nbuf)
 int main(void)
 {
 	static char buf[100];
-	int fd, status;
+	int fd;
   
 	// Assumes three file descriptors open.
 	while((fd = open("console", O_RDWR)) >= 0){
@@ -150,7 +148,7 @@ int main(void)
 		}
 		if(fork1() == 0)
 			runcmd(parsecmd(buf));
-		wait(&status);
+		wait();
 	}
 	exit();
 }
