@@ -1,0 +1,27 @@
+// CHANGES to XV6 for Lab 2
+
+Part 1: Memory Translation System Call
+
+proc.c: 
+	Function added called v2p which translate the virtual address into the physical address
+	Lines: 413-427
+
+syscall.c
+	system call declaration added for v2p
+	Lines: 71, 116
+
+sysproc.c
+	system call function added for v2p
+	Lines: 70-76
+
+defs.h
+	function declaration for v2p in proc.c file
+	Lines: 122
+	
+syscall.h
+	defining the syscall call declaration for v2p
+	Lines: 23
+
+Part 2: Null Pointer Dereference
+
+
