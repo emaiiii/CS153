@@ -75,8 +75,8 @@ void userinit(void)
 	if((p->pgdir = setupkvm()) == 0)
 		panic("userinit: out of memory?");
 	inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
+	p->topStack = 0;
 	p->sz = PGSIZE;
-	p->stack_top = 0;
 	memset(p->tf, 0, sizeof(*p->tf));
 	p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
 	p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
@@ -119,15 +119,15 @@ int fork(void)
 		return -1;
 
 	// Copy process state from p.
-	if((np->pgdir = copyuvm(proc->pgdir, proc->sz, proc->stack_top)) == 0){
+	if((np->pgdir = copyuvm(proc->pgdir, proc->sz, proc->topStack)) == 0){
 		kfree(np->kstack);
 		np->kstack = 0;
 		np->state = UNUSED;
 		return -1;
 	}
-	np->sz = proc->sz;
-	np->stack_top = proc->stack_top;
 	np->parent = proc;
+	np->topStack = proc->topStack;
+	np->sz = proc->sz;
 	*np->tf = *proc->tf;
 	// Clear %eax so that fork returns 0 in the child.
 	np->tf->eax = 0;

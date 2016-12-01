@@ -11,7 +11,7 @@ int exec(char *path, char **argv)
 {
 	char *s, *last;
 	int i, off;
-	uint argc, sz, stack_top, sp, ustack[3+MAXARG+1];
+	uint argc, sz, topStack, sp, ustack[3+MAXARG+1];
 	struct elfhdr elf;
 	struct inode *ip;
 	struct proghdr ph;
@@ -58,10 +58,10 @@ int exec(char *path, char **argv)
 
 	// Allocate two pages at the next page boundary.
 	// Make the first inaccessible.  Use the second as the user stack.
-	stack_top = USERTOP - 2*PGSIZE;
-	if((sp = allocuvm(pgdir, stack_top, USERTOP)) == 0)
+	topStack = USERTOP - 2*PGSIZE;
+	if((sp = allocuvm(pgdir, topStack, USERTOP)) == 0)
 		goto bad;
-	clearpteu(pgdir, (char*)stack_top);
+	clearpteu(pgdir, (char*)topStack);
 
 	// Push argument strings, prepare rest of stack in ustack.
 	for(argc = 0; argv[argc]; argc++) {
@@ -90,7 +90,7 @@ int exec(char *path, char **argv)
 	oldpgdir = proc->pgdir;
 	proc->pgdir = pgdir;
 	proc->sz = sz;
-	proc->stack_top = stack_top;
+	proc->topStack = topStack;
 	proc->tf->eip = elf.entry;  // main
 	proc->tf->esp = sp;
 	switchuvm(proc);

@@ -40,7 +40,7 @@ void trap(struct trapframe *tf)
 	}
   	switch(tf->trapno){
 		case T_IRQ0 + IRQ_TIMER:
-			if(cpu->id == 0){
+			if(cpu->apicid == 0){
 				acquire(&tickslock);
 				ticks++;
 				wakeup(&ticks);
@@ -65,16 +65,16 @@ void trap(struct trapframe *tf)
 			break;
 		case T_IRQ0 + 7:
 		case T_IRQ0 + IRQ_SPURIOUS:
-			cprintf("cpu%d: spurious interrupt at %x:%x\n", cpu->id, tf->cs, tf->eip);
+			cprintf("cpu%d: spurious interrupt at %x:%x\n", cpu->apicid, tf->cs, tf->eip);
 			lapiceoi();
 			break;
 		case T_PGFLT:
-			if(growstack(proc->pgdir, proc->tf->esp, proc->stack_top) == 0)
+			if(growstack(proc->pgdir, proc->tf->esp, proc->topStack) == 0)
 				break;
-			cprintf("pid %d %s: page fault on %d eip 0x%x ",proc->pid, proc->name, cpu->id, tf->eip);
-			cprintf("stack 0x%x sz 0x%x addr 0x%x\n", proc->stack_top, proc->sz, rcr2());
+			cprintf("pid %d %s: page fault on %d eip 0x%x ",proc->pid, proc->name, cpu->apicid, tf->eip);
+			cprintf("stack 0x%x sz 0x%x addr 0x%x\n", proc->topStack, proc->sz, rcr2());
 			if(proc->tf->esp > proc->sz)
-				deallocuvm(proc->pgdir, USERTOP, proc->stack_top);
+				deallocuvm(proc->pgdir, USERTOP, proc->topStack);
 
 			proc->killed = 1;
 			break;
@@ -82,11 +82,11 @@ void trap(struct trapframe *tf)
 		default:
 			if(proc == 0 || (tf->cs&3) == 0){
 				// In kernel, it must be our mistake.
-				cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n", tf->trapno, cpu->id, tf->eip, rcr2());
+				cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n", tf->trapno, cpu->apicid, tf->eip, rcr2());
 				panic("trap");
 			}
 			// In user space, assume process misbehaved.
-			cprintf("pid %d %s: trap %d err %d on cpu %d ""eip 0x%x addr 0x%x--kill proc\n", proc->pid, proc->name, tf->trapno, tf->err, cpu->id, tf->eip, rcr2());
+			cprintf("pid %d %s: trap %d err %d on cpu %d ""eip 0x%x addr 0x%x--kill proc\n", proc->pid, proc->name, tf->trapno, tf->err, cpu->apicid, tf->eip, rcr2());
 			proc->killed = 1;
 	}
 

@@ -331,26 +331,26 @@ bad:
 	freevm(d);
 	return 0;
 }
-int growstack(pde_t *pgdir, uint sp, uint stack_top)
+int growstack(pde_t *pgdir, uint sp, uint topStack)
 {
 	pte_t *pte;
-	uint new_top = stack_top - PGSIZE;
+	uint newTop = topStack - PGSIZE;
 
-	if (sp > (stack_top + PGSIZE))
+	if (sp > (topStack + PGSIZE))
 		return -1;
 
 
 	// don't allocate new memory if already present
-	if((pte = walkpgdir(pgdir, (void *) new_top, 1)) == 0)
+	if((pte = walkpgdir(pgdir, (void *) newTop, 1)) == 0)
 		return -1;
 	if(*pte & PTE_P)
 		return -1;
-	if(allocuvm(pgdir, new_top, stack_top) == 0)	
+	if(allocuvm(pgdir, newTop, topStack) == 0)	
 		return -1;
 
-	proc->stack_top = proc->stack_top - PGSIZE;
-	setpteu(proc->pgdir, (char *)(proc->stack_top + PGSIZE));
-	clearpteu(proc->pgdir, (char *)proc->stack_top);
+	proc->topStack = proc->topStack - PGSIZE;
+	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
+	clearpteu(proc->pgdir, (char *)proc->topStack);
 	return 0;
 }
 // Map user virtual address to kernel address.
