@@ -1,0 +1,7 @@
+Sara Hu 861150933
+Francisco Munoz 861174271
+Due 12/02/2016
+Lecture Section: 001
+Lab Section: 021
+
+To run and compile the operating system, you untar the file, type in the command make qemu and the code will compile and open up the QEMU simulator.
