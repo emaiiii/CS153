@@ -277,7 +277,6 @@ void sched(void)
 	swtch(&proc->context, cpu->scheduler);
 	cpu->intena = intena;
 }
-// Give up the CPU for one scheduling round.
 void yield(void)
 {
 	acquire(&ptable.lock);
